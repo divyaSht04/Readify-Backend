@@ -1,32 +1,26 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Third Year All folder\\dotNet\\SecondSem\\Readify\\Backend\\Backend.csproj": {}
+    "/Users/kristina/Desktop/Readifyy/Backend.csproj": {}
   },
   "projects": {
-    "D:\\Third Year All folder\\dotNet\\SecondSem\\Readify\\Backend\\Backend.csproj": {
+    "/Users/kristina/Desktop/Readifyy/Backend.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Third Year All folder\\dotNet\\SecondSem\\Readify\\Backend\\Backend.csproj",
+        "projectUniqueName": "/Users/kristina/Desktop/Readifyy/Backend.csproj",
         "projectName": "Backend",
-        "projectPath": "D:\\Third Year All folder\\dotNet\\SecondSem\\Readify\\Backend\\Backend.csproj",
-        "packagesPath": "C:\\Users\\DELL\\.nuget\\packages\\",
-        "outputPath": "D:\\Third Year All folder\\dotNet\\SecondSem\\Readify\\Backend\\obj\\",
+        "projectPath": "/Users/kristina/Desktop/Readifyy/Backend.csproj",
+        "packagesPath": "/Users/kristina/.nuget/packages/",
+        "outputPath": "/Users/kristina/Desktop/Readifyy/obj/",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\DELL\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/Users/kristina/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
+          "/Users/kristina/.dotnet/library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -44,14 +38,27 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        },
-        "SdkAnalysisLevel": "9.0.200"
+        }
       },
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "BCrypt.Net-Next": {
+              "target": "Package",
+              "version": "[4.0.3, )"
+            },
             "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[8.0.10, )"
+            },
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[8.0.10, )"
+            },
+            "Npgsql.EntityFrameworkCore.PostgreSQL": {
               "target": "Package",
               "version": "[8.0.10, )"
             },
@@ -83,7 +90,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.201/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/Users/kristina/.dotnet/sdk/8.0.401/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

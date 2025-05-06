@@ -4,9 +4,9 @@ using Backend.enums;
 using Backend.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using BCrypt.Net;
 
 namespace Backend.Services;
-
 
 public class AuthService : IAuthService
 {
@@ -31,8 +31,7 @@ public class AuthService : IAuthService
         if (user == null)
             return new UnauthorizedObjectResult("Invalid email or password");
 
-        // In a production environment, you should use password hashing
-        if (user.Password != request.Password)
+        if (!BCrypt.Net.BCrypt.Verify(request.Password, user.Password))
             return new UnauthorizedObjectResult("Invalid email or password");
 
         return await GenerateAuthResponse(user);
@@ -42,21 +41,24 @@ public class AuthService : IAuthService
     {
         if (request == null)
             return new BadRequestObjectResult("Invalid client request");
-        
+
         if (await _context.Users.AnyAsync(u => u.Email == request.Email))
             return new ConflictObjectResult("User with this email already exists");
-        
+
+        // Hash the password using BCrypt
+        var hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password);
+        Console.WriteLine($"Hashed Password: {hashedPassword}"); // Debug output
+
         var user = new Users
         {
             Id = Guid.NewGuid(),
             Email = request.Email,
-            Password = request.Password, 
+            Password = hashedPassword,
             Name = request.FullName,
             PhoneNumber = request.PhoneNumber,
             Address = request.Address,
             Image = request.Image,
-            DateOfBirth = DateTime.UtcNow, 
-            Role = Roles.USER 
+            Role = Roles.USER
         };
 
         await _context.Users.AddAsync(user);
@@ -75,7 +77,7 @@ public class AuthService : IAuthService
 
         var principal = _jwtUtils.GetPrincipalFromExpiredToken(accessToken);
         if (principal == null)
-            new BadRequestObjectResult("Invalid access token or refresh token");
+            return new BadRequestObjectResult("Invalid access token or refresh token");
 
         string userId = principal.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
         if (string.IsNullOrEmpty(userId))
@@ -99,6 +101,7 @@ public class AuthService : IAuthService
             return new NotFoundResult();
 
         user.RefreshToken = null;
+        user.RefreshTokenExpiryTime = null;
         await _context.SaveChangesAsync();
 
         return new NoContentResult();
@@ -113,7 +116,7 @@ public class AuthService : IAuthService
         user.RefreshToken = refreshToken;
         user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(
             Convert.ToDouble(_configuration["JWT:RefreshTokenValidityInDays"] ?? "7"));
-        
+
         await _context.SaveChangesAsync();
 
         return new OkObjectResult(new AuthResponse
