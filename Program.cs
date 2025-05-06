@@ -1,7 +1,11 @@
 using Backend.Context;
 using Backend.Services;
 using Backend.Utils;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
