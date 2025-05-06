@@ -10,7 +10,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6cec4dfd-851c-4185-b4da-0c20255b61d8" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Model/Book.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Backend/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Backend/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Program.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -123,7 +125,7 @@
       <updated>1746537698397</updated>
       <workItem from="1746537701991" duration="5110000" />
       <workItem from="1746543723197" duration="314000" />
-      <workItem from="1746550012103" duration="1225000" />
+      <workItem from="1746550012103" duration="2237000" />
     </task>
     <task id="LOCAL-00001" summary="changes!">
       <option name="closed" value="true" />
@@ -133,7 +135,15 @@
       <option name="project" value="LOCAL" />
       <updated>1746550658907</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="the change">
+      <option name="closed" value="true" />
+      <created>1746551296844</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1746551296844</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -144,7 +154,8 @@
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
     <MESSAGE value="changes!" />
-    <option name="LAST_COMMIT_MESSAGE" value="changes!" />
+    <MESSAGE value="the change" />
+    <option name="LAST_COMMIT_MESSAGE" value="the change" />
     <option name="GROUP_MULTIFILE_MERGE_BY_DIRECTORY" value="true" />
   </component>
   <component name="XDebuggerManager">
