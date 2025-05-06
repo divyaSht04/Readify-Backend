@@ -36,7 +36,6 @@ public class Users
     
     public DateTime Updated { get; set; } = DateTime.UtcNow;
     
-    // JWT Refresh Token Properties
     [Column("refresh_token")]
     public string? RefreshToken { get; set; }
     

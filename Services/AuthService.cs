@@ -47,8 +47,7 @@ public class AuthService : IAuthService
 
         if (await _context.Users.AnyAsync(u => u.Email == request.Email))
             return new ConflictObjectResult("User with this email already exists");
-
-        // Hash the password using BCrypt
+        
         var hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password);
         Console.WriteLine($"Hashed Password: {hashedPassword}"); // Debug output
 
