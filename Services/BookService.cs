@@ -27,12 +27,12 @@ public class BookService : IBookService
     public async Task<ActionResult<BookResponse>> GetBookById(Guid id)
     {
         var book = await _context.Books.FindAsync(id);
-        
+
         if (book == null)
         {
             return new NotFoundObjectResult($"Book with ID {id} not found.");
         }
-        
+
         return MapToBookResponse(book);
     }
 
@@ -42,72 +42,79 @@ public class BookService : IBookService
         {
             ID = Guid.NewGuid(),
             Title = request.Title,
+            Author = request.Author,
             ISBN = request.ISBN,
             Price = request.Price,
             Description = request.Description,
-            PublishedDate = request.PublishedDate.HasValue ? DateTime.SpecifyKind(request.PublishedDate.Value, DateTimeKind.Utc) : null,
+            PublishedDate = request.PublishedDate.HasValue
+                ? DateTime.SpecifyKind(request.PublishedDate.Value, DateTimeKind.Utc)
+                : null,
             StockQuantity = request.StockQuantity,
             Category = request.Category,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
-        
+
         _context.Books.Add(book);
         await _context.SaveChangesAsync();
-        
+
         return MapToBookResponse(book);
     }
 
     public async Task<ActionResult<BookResponse>> UpdateBook(Guid id, UpdateBookRequest request)
     {
         var book = await _context.Books.FindAsync(id);
-        
+
         if (book == null)
         {
             return new NotFoundObjectResult($"Book with ID {id} not found.");
         }
-        
+
         // Update only the properties that are provided
         if (request.Title != null)
             book.Title = request.Title;
-            
+
+        if (request.Author != null)
+            book.Author = request.Author;
+
+
         if (request.ISBN != null)
             book.ISBN = request.ISBN;
-            
+
         if (request.Price.HasValue)
             book.Price = request.Price.Value;
-            
+
         if (request.Description != null)
             book.Description = request.Description;
-            
+
         if (request.PublishedDate.HasValue)
             book.PublishedDate = DateTime.SpecifyKind(request.PublishedDate.Value, DateTimeKind.Utc);
-            
+
         if (request.StockQuantity.HasValue)
             book.StockQuantity = request.StockQuantity.Value;
-            
+
         if (request.Category != null)
             book.Category = request.Category;
-            
+
         book.UpdatedAt = DateTime.UtcNow;
-        
+
         await _context.SaveChangesAsync();
-        
+
         return MapToBookResponse(book);
     }
 
     public async Task<ActionResult> DeleteBook(Guid id)
     {
         var book = await _context.Books.FindAsync(id);
-        
+
         if (book == null)
         {
             return new NotFoundObjectResult($"Book with ID {id} not found.");
         }
-        
+
         _context.Books.Remove(book);
         await _context.SaveChangesAsync();
-        
+
         return new OkResult();
     }
 
@@ -117,19 +124,20 @@ public class BookService : IBookService
         {
             return await GetAllBooks();
         }
-        
+
         query = query.ToLower();
-        
+
         var books = await _context.Books
             .Where(b => b.Title.ToLower().Contains(query) || 
-                   b.ISBN.ToLower().Contains(query) ||
-                   b.Description.ToLower().Contains(query) ||
-                   b.Category.Any(c => c.ToLower().Contains(query)))
+                        b.Author.ToLower().Contains(query) ||
+                        b.ISBN.ToLower().Contains(query) ||
+                        b.Description.ToLower().Contains(query) ||
+                        b.Category.Any(c => c.ToLower().Contains(query)))
             .ToListAsync();
-            
+
         return books.Select(MapToBookResponse).ToList();
     }
-    
+
     // Helper method to map from Book entity to BookResponse DTO
     private static BookResponse MapToBookResponse(Book book)
     {
@@ -137,6 +145,7 @@ public class BookService : IBookService
         {
             Id = book.ID,
             Title = book.Title,
+            Author = book.Author,
             ISBN = book.ISBN,
             Price = book.Price,
             Description = book.Description,
