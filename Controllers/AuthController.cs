@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Backend.Dtos;
 using Backend.Services;
@@ -36,10 +36,9 @@ public class AuthController : ControllerBase
     }
 
     [Authorize]
-    [HttpPost("revoke-token")]
-    public async Task<ActionResult> RevokeToken()
+    [HttpPost("revoke-token/{userId}")]
+    public async Task<ActionResult> RevokeToken(string userId)
     {
-        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         return await _authService.RevokeToken(userId);
     }
 }

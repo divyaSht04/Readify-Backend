@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Context;
 
@@ -9,4 +9,5 @@ public class ApplicationDBContext : DbContext
     }
 
     public DbSet<Users> Users { get; set; }
+    public DbSet<Book> Books { get; set; }
 }
