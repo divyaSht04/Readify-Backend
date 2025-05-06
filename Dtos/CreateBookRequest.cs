@@ -12,6 +12,11 @@ public class CreateBookRequest
     
     [Required]
     [StringLength(13)]
+    public string Author { get; set; }
+
+    
+    [Required]
+    [StringLength(13)]
     public string ISBN { get; set; }
     
     [Required]

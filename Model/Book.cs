@@ -11,9 +11,12 @@ public class Book
     [Column("title"), MaxLength(100), Required]
     [StringLength(255)] 
     public string Title { get; set; }
-
-    [Column(name:"ISBN"), MaxLength(100), Required]
-    [StringLength(13)] 
+    
+    [Column( name: "author"),MaxLength(20), Required]
+    public string Author { get; set; }
+    
+    [Column(name: "ISBN"), MaxLength(100), Required]
+    [StringLength(13)]
     public string ISBN { get; set; }
 
     [Column(name:"price" , TypeName = "decimal(10,2)")]

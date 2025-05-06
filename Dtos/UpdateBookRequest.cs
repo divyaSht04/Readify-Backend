@@ -10,6 +10,9 @@ public class UpdateBookRequest
     public string Title { get; set; }
     
     [StringLength(13)]
+    public string Author{ get; set; }
+    
+    [StringLength(13)]
     public string ISBN { get; set; }
     
     public decimal? Price { get; set; }
