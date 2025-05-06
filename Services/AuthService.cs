@@ -55,7 +55,6 @@ public class AuthService : IAuthService
             PhoneNumber = request.PhoneNumber,
             Address = request.Address,
             Image = request.Image,
-            DateOfBirth = DateTime.UtcNow, 
             Role = Roles.USER 
         };
 
