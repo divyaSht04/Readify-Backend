@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Backend.enums;
 
@@ -16,10 +17,11 @@ public class Users
     [Column(name:"phone_number"), MaxLength(100), Required]
     public string PhoneNumber { get; set; }
     
+    
     [Column("email"), MaxLength(100), Required]
     public string Email { get; set; }
     
-    [Column("password"), Required]
+    [Column("password"), Required, MaxLength(255)]
     public string Password { get; set; }
     
     [Column("address"), MaxLength(100), Required]
