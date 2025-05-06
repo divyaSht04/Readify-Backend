@@ -30,8 +30,7 @@ public class AuthService : IAuthService
 
         if (user == null)
             return new UnauthorizedObjectResult("Invalid email or password");
-
-        // In a production environment, you should use password hashing
+        
         if (user.Password != request.Password)
             return new UnauthorizedObjectResult("Invalid email or password");
 
