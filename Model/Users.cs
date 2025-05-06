@@ -16,9 +16,6 @@ public class Users
     [Column(name:"phone_number"), MaxLength(100), Required]
     public string PhoneNumber { get; set; }
     
-    [Column("date_of_birth"), Required]
-    public DateTime DateOfBirth { get; set; }
-    
     [Column("email"), MaxLength(100), Required]
     public string Email { get; set; }
     
