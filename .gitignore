@@ -1,6 +1,7 @@
 ﻿.NET Core build folders
 bin/
 obj/
+.idea
 
 Visual Studio files
 .vs/

@@ -10,4 +10,6 @@ public interface IAuthService
     Task<ActionResult<AuthResponse>> Register(RegisterRequest request);
     Task<ActionResult<AuthResponse>> RefreshToken(RefreshTokenRequest request);
     Task<ActionResult> RevokeToken(string userId);
+    Task<ActionResult> EditProfile(string userId, EditProfileRequest request);
+    Task<ActionResult> ChangePassword(string userId, ChangePasswordRequest request); 
 }

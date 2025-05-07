@@ -43,4 +43,25 @@ public class AuthController : ControllerBase
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         return await _authService.RevokeToken(userId);
     }
+    [HttpPut("profile")]
+    [Authorize]
+    public async Task<ActionResult> EditProfile([FromBody] EditProfileRequest request)
+    {
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized("Invalid user");
+
+        return await _authService.EditProfile(userId, request);
+    }
+    
+    [HttpPut("change-password")]
+    [Authorize]
+    public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized("Invalid user");
+
+        return await _authService.ChangePassword(userId, request);
+    }
 }
