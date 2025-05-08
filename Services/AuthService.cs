@@ -47,8 +47,7 @@ public class AuthService : IAuthService
 
         if (await _context.Users.AnyAsync(u => u.Email == request.Email))
             return new ConflictObjectResult("User with this email already exists");
-
-        // Hash the password using BCrypt
+        
         var hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password);
         Console.WriteLine($"Hashed Password: {hashedPassword}"); // Debug output
 
@@ -109,6 +108,41 @@ public class AuthService : IAuthService
 
         return new NoContentResult();
     }
+    
+   
+    public async Task<ActionResult> ChangePassword(string userId, ChangePasswordRequest request)
+    {
+        if (request == null || string.IsNullOrEmpty(request.CurrentPassword) || string.IsNullOrEmpty(request.NewPassword))
+            return new BadRequestObjectResult("Invalid client request");
+
+        if (!Guid.TryParse(userId, out var parsedUserId))
+            return new BadRequestObjectResult("Invalid user ID");
+
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == parsedUserId);
+        if (user == null)
+            return new NotFoundObjectResult("User not found");
+
+        // Trim inputs to handle potential whitespace
+        var currentPassword = request.CurrentPassword?.Trim();
+        var newPassword = request.NewPassword?.Trim();
+
+        // Verify current password
+        if (!BCrypt.Net.BCrypt.Verify(currentPassword, user.Password))
+            return new UnauthorizedObjectResult("Current password is incorrect");
+
+        // Check if new password is different
+        if (currentPassword == newPassword)
+            return new BadRequestObjectResult("New password must be different from the current password");
+
+        // Hash new password
+        user.Password = BCrypt.Net.BCrypt.HashPassword(newPassword);
+        user.Updated = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync();
+
+        return new OkObjectResult(new { message = "Password changed successfully" });
+    }
+
 
     private async Task<ActionResult<AuthResponse>> GenerateAuthResponse(Users user)
     {
