@@ -41,4 +41,16 @@ public class AuthController : ControllerBase
     {
         return await _authService.RevokeToken(userId);
     }
+    
+    
+    [HttpPut("change-password")]
+    [Authorize]
+    public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized("Invalid user");
+
+        return await _authService.ChangePassword(userId, request);
+    }
 }

@@ -49,6 +49,8 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 // Register Book service
 builder.Services.AddScoped<IBookService, BookService>();
 
+builder.Services.AddScoped<IUserService, UserService>();
+
 // Configure CORS
 builder.Services.AddCors(options =>
 {
