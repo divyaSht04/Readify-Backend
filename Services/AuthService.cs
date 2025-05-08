@@ -109,6 +109,16 @@ public class AuthService : IAuthService
         return new NoContentResult();
     }
 
+    public Task<ActionResult> EditProfile(string userId, EditProfileRequest request)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<ActionResult> ChangePassword(string userId, ChangePasswordRequest request)
+    {
+        throw new NotImplementedException();
+    }
+
     private async Task<ActionResult<AuthResponse>> GenerateAuthResponse(Users user)
     {
         var token = _jwtUtils.GenerateJwtToken(user);
