@@ -13,6 +13,8 @@ public class BookResponse
     public string Description { get; set; }
     public DateTime? PublishedDate { get; set; }
     public int StockQuantity { get; set; }
+    public bool IsComingSoon { get; set; }
+    public DateTime? ReleaseDate { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
     public List<string> Category { get; set; }

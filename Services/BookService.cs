@@ -50,6 +50,10 @@ public class BookService : IBookService
                 ? DateTime.SpecifyKind(request.PublishedDate.Value, DateTimeKind.Utc)
                 : null,
             StockQuantity = request.StockQuantity,
+            IsComingSoon = request.IsComingSoon,
+            ReleaseDate = request.ReleaseDate.HasValue
+                ? DateTime.SpecifyKind(request.ReleaseDate.Value, DateTimeKind.Utc)
+                : null,
             Category = request.Category,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
@@ -92,6 +96,12 @@ public class BookService : IBookService
 
         if (request.StockQuantity.HasValue)
             book.StockQuantity = request.StockQuantity.Value;
+
+        if (request.IsComingSoon.HasValue)
+            book.IsComingSoon = request.IsComingSoon.Value;
+
+        if (request.ReleaseDate.HasValue)
+            book.ReleaseDate = DateTime.SpecifyKind(request.ReleaseDate.Value, DateTimeKind.Utc);
 
         if (request.Category != null)
             book.Category = request.Category;
@@ -137,6 +147,16 @@ public class BookService : IBookService
 
         return books.Select(MapToBookResponse).ToList();
     }
+    
+    public async Task<ActionResult<List<BookResponse>>> GetComingSoonBooks()
+    {
+        var books = await _context.Books
+            .Where(b => b.IsComingSoon)
+            .OrderBy(b => b.ReleaseDate)
+            .ToListAsync();
+            
+        return books.Select(MapToBookResponse).ToList();
+    }
 
     // Helper method to map from Book entity to BookResponse DTO
     private static BookResponse MapToBookResponse(Book book)
@@ -151,6 +171,8 @@ public class BookService : IBookService
             Description = book.Description,
             PublishedDate = book.PublishedDate,
             StockQuantity = book.StockQuantity,
+            IsComingSoon = book.IsComingSoon,
+            ReleaseDate = book.ReleaseDate,
             CreatedAt = book.CreatedAt,
             UpdatedAt = book.UpdatedAt,
             Category = book.Category
