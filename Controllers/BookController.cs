@@ -55,4 +55,10 @@ public class BookController : ControllerBase
     {
         return await _bookService.SearchBooks(query);
     }
+    
+    [HttpGet("coming-soon")]
+    public async Task<ActionResult<List<BookResponse>>> GetComingSoonBooks()
+    {
+        return await _bookService.GetComingSoonBooks();
+    }
 }

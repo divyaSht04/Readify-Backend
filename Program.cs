@@ -49,6 +49,12 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 // Register Book service
 builder.Services.AddScoped<IBookService, BookService>();
 
+// Register BookAccolade service
+builder.Services.AddScoped<IBookAccoladeService, BookAccoladeService>();
+
+// Register Booking service
+builder.Services.AddScoped<IBookingService, BookingService>();
+
 builder.Services.AddScoped<IUserService, UserService>();
 
 // Configure CORS
@@ -77,9 +83,12 @@ builder.Services.AddAuthentication(options =>
     {
         ValidateIssuer = true,
         ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
         ValidAudience = builder.Configuration["JWT:ValidAudience"],
         ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"])),
+        ClockSkew = TimeSpan.Zero
     };
 });
 

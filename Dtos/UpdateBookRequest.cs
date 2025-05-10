@@ -23,5 +23,9 @@ public class UpdateBookRequest
     
     public int? StockQuantity { get; set; }
     
+    public bool? IsComingSoon { get; set; }
+    
+    public DateTime? ReleaseDate { get; set; }
+    
     public List<string> Category { get; set; }
 }

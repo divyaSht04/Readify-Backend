@@ -14,4 +14,5 @@ public interface IBookService
     Task<ActionResult<BookResponse>> UpdateBook(Guid id, UpdateBookRequest request);
     Task<ActionResult> DeleteBook(Guid id);
     Task<ActionResult<List<BookResponse>>> SearchBooks(string query);
+    Task<ActionResult<List<BookResponse>>> GetComingSoonBooks();
 }

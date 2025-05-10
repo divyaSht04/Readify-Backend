@@ -28,5 +28,9 @@ public class CreateBookRequest
     
     public int StockQuantity { get; set; } = 0;
     
+    public bool IsComingSoon { get; set; } = false;
+    
+    public DateTime? ReleaseDate { get; set; }
+    
     public List<string> Category { get; set; } = new List<string>();
 }

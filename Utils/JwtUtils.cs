@@ -28,7 +28,7 @@ public class JwtUtils
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.Name, user.Name),
-                new Claim(ClaimTypes.Role, user.Role.ToString())
+                new Claim(ClaimTypes.Role, user.Role.ToString().ToUpper())
             }),
             Expires = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["JWT:TokenValidityInMinutes"] ?? "60")),
             Issuer = _configuration["JWT:ValidIssuer"],
@@ -55,7 +55,7 @@ public class JwtUtils
             ValidateIssuer = true,
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"])),
-            ValidateLifetime = false, // Don't validate lifetime here
+            ValidateLifetime = false,
             ValidIssuer = _configuration["JWT:ValidIssuer"],
             ValidAudience = _configuration["JWT:ValidAudience"]
         };
