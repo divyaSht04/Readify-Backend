@@ -11,4 +11,5 @@ public interface IAuthService
     Task<ActionResult<AuthResponse>> RefreshToken(RefreshTokenRequest request);
     Task<ActionResult> RevokeToken(string userId);
     Task<ActionResult> ChangePassword(string userId, ChangePasswordRequest request); 
+    Task<ActionResult> VerifyOtp(string userId, string otp);
 }

@@ -2,6 +2,7 @@
 bin/
 obj/
 .idea/
+.idea
 
 Visual Studio files
 .vs/

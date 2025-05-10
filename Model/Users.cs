@@ -41,4 +41,12 @@ public class Users
     
     [Column("refresh_token_expiry")]
     public DateTime? RefreshTokenExpiryTime { get; set; }
+    [Column("otp")]
+    public string? Otp { get; set; } // Store the OTP
+
+    [Column("otp_expiry")]
+    public DateTime? OtpExpiry { get; set; } // OTP expiry time
+
+    [Column("is_email_verified")]
+    public bool IsEmailVerified { get; set; } = false;
 }

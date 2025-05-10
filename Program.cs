@@ -45,6 +45,8 @@ builder.Services.AddDbContext<ApplicationDBContext>(options =>
 // Register JWT utils and services
 builder.Services.AddSingleton<JwtUtils>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IEmailSenderService, EmailSenderService>();
+builder.Services.AddScoped<IEmailVerificationService, EmailVerificationService>();
 
 // Register Book service
 builder.Services.AddScoped<IBookService, BookService>();
