@@ -52,6 +52,11 @@ namespace Backend.Migrations
                         .HasColumnType("character varying(13)")
                         .HasColumnName("ISBN");
 
+                    b.Property<string>("Image")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("image");
+
                     b.Property<bool>("IsComingSoon")
                         .HasColumnType("boolean")
                         .HasColumnName("is_coming_soon");
@@ -128,40 +133,116 @@ namespace Backend.Migrations
                     b.ToTable("BookAccolades");
                 });
 
-            modelBuilder.Entity("Backend.Booking", b =>
+            modelBuilder.Entity("Backend.Model.Cart", b =>
                 {
-                    b.Property<Guid>("ID")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("BookID")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("BookingDate")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime?>("PickupDate")
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Carts");
+                });
+
+            modelBuilder.Entity("Backend.Model.CartItem", b =>
+                {
+                    b.Property<Guid>("BookId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CartId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("integer");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("integer");
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<decimal>("TotalPrice")
-                        .HasColumnType("decimal(10,2)");
+                    b.HasKey("BookId", "CartId");
 
-                    b.Property<Guid>("UserID")
+                    b.HasIndex("CartId");
+
+                    b.ToTable("CartItems");
+                });
+
+            modelBuilder.Entity("Backend.Models.BannerAnnouncement", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.HasKey("ID");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
 
-                    b.HasIndex("BookID");
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("timestamp with time zone");
 
-                    b.HasIndex("UserID");
+                    b.Property<string>("Heading")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                    b.ToTable("Bookings");
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("BannerAnnouncements");
+                });
+
+            modelBuilder.Entity("Backend.Models.GlobalDiscount", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DiscountName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("OnSale")
+                        .HasColumnType("boolean");
+
+                    b.Property<decimal>("Percentage")
+                        .HasColumnType("numeric");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StartDate", "EndDate");
+
+                    b.ToTable("GlobalDiscounts");
                 });
 
             modelBuilder.Entity("Backend.Users", b =>
@@ -238,28 +319,44 @@ namespace Backend.Migrations
                     b.Navigation("Book");
                 });
 
-            modelBuilder.Entity("Backend.Booking", b =>
+            modelBuilder.Entity("Backend.Model.Cart", b =>
                 {
-                    b.HasOne("Backend.Book", "Book")
+                    b.HasOne("Backend.Users", "User")
                         .WithMany()
-                        .HasForeignKey("BookID")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Backend.Users", "User")
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Backend.Model.CartItem", b =>
+                {
+                    b.HasOne("Backend.Book", "Book")
                         .WithMany()
-                        .HasForeignKey("UserID")
+                        .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Backend.Model.Cart", "Cart")
+                        .WithMany("Items")
+                        .HasForeignKey("CartId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Book");
 
-                    b.Navigation("User");
+                    b.Navigation("Cart");
                 });
 
             modelBuilder.Entity("Backend.Book", b =>
                 {
                     b.Navigation("Accolades");
+                });
+
+            modelBuilder.Entity("Backend.Model.Cart", b =>
+                {
+                    b.Navigation("Items");
                 });
 #pragma warning restore 612, 618
         }

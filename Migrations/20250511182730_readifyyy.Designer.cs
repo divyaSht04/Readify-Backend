@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Backend.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20250510203923_AddBookingEntity")]
-    partial class AddBookingEntity
+    [Migration("20250511182730_readifyyy")]
+    partial class readifyyy
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -54,6 +54,11 @@ namespace Backend.Migrations
                         .HasMaxLength(13)
                         .HasColumnType("character varying(13)")
                         .HasColumnName("ISBN");
+
+                    b.Property<string>("Image")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("image");
 
                     b.Property<bool>("IsComingSoon")
                         .HasColumnType("boolean")
@@ -143,9 +148,6 @@ namespace Backend.Migrations
                     b.Property<DateTime>("BookingDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime?>("PickupDate")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<int>("Quantity")
                         .HasColumnType("integer");
 
@@ -165,6 +167,68 @@ namespace Backend.Migrations
                     b.HasIndex("UserID");
 
                     b.ToTable("Bookings");
+                });
+
+            modelBuilder.Entity("Backend.Models.BannerAnnouncement", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("BannerAnnouncements");
+                });
+
+            modelBuilder.Entity("Backend.Models.GlobalDiscount", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DiscountName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("OnSale")
+                        .HasColumnType("boolean");
+
+                    b.Property<decimal>("Percentage")
+                        .HasColumnType("numeric");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StartDate", "EndDate");
+
+                    b.ToTable("GlobalDiscounts");
                 });
 
             modelBuilder.Entity("Backend.Users", b =>

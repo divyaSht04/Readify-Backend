@@ -16,12 +16,14 @@ public class AuthService : IAuthService
     private readonly ApplicationDBContext _context;
     private readonly JwtUtils _jwtUtils;
     private readonly IConfiguration _configuration;
+    private readonly IFileService _fileService;
 
-    public AuthService(ApplicationDBContext context, JwtUtils jwtUtils, IConfiguration configuration)
+    public AuthService(ApplicationDBContext context, JwtUtils jwtUtils, IConfiguration configuration, IFileService fileService)
     {
         _context = context;
         _jwtUtils = jwtUtils;
         _configuration = configuration;
+        _fileService = fileService;
     }
 
     public async Task<ActionResult<AuthResponse>> Login(LoginRequest request)
@@ -51,6 +53,13 @@ public class AuthService : IAuthService
         var hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password);
         Console.WriteLine($"Hashed Password: {hashedPassword}"); // Debug output
 
+        // Save the image if provided
+        string? imagePath = null;
+        if (request.ImageFile != null)
+        {
+            imagePath = await _fileService.SaveFile(request.ImageFile, "users");
+        }
+
         var user = new Users
         {
             Id = Guid.NewGuid(),
@@ -59,8 +68,8 @@ public class AuthService : IAuthService
             Name = request.FullName,
             PhoneNumber = request.PhoneNumber,
             Address = request.Address,
-            Image = request.Image,
-            Role = Roles.USER
+            Image = imagePath,
+            Role = Roles.ADMIN
         };
 
         await _context.Users.AddAsync(user);
@@ -125,14 +134,13 @@ public class AuthService : IAuthService
         // Trim inputs to handle potential whitespace
         var currentPassword = request.CurrentPassword?.Trim();
         var newPassword = request.NewPassword?.Trim();
-
-        // Verify current password
+        
         if (!BCrypt.Net.BCrypt.Verify(currentPassword, user.Password))
             return new UnauthorizedObjectResult("Current password is incorrect");
 
         // Check if new password is different
         if (currentPassword == newPassword)
-            return new BadRequestObjectResult("New password must be different from the current password");
+            return new BadRequestObjectResult("New password must be different from the current password !");
 
         // Hash new password
         user.Password = BCrypt.Net.BCrypt.HashPassword(newPassword);

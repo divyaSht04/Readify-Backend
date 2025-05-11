@@ -10,6 +10,8 @@ public class BookResponse
     public string Author { get; set; }
     public string ISBN { get; set; }
     public decimal Price { get; set; }
+    public decimal? DiscountedPrice { get; set; } 
+    public bool OnSale { get; set; }
     public string Description { get; set; }
     public DateTime? PublishedDate { get; set; }
     public int StockQuantity { get; set; }
@@ -18,4 +20,5 @@ public class BookResponse
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
     public List<string> Category { get; set; }
+    public string? Image { get; set; }
 }
