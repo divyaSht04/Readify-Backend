@@ -29,6 +29,12 @@ namespace Backend.Controllers
             return await _adminService.RemoveGlobalDiscount();
         }
         
+        [HttpPost("staff")]
+        public async Task<ActionResult<StaffResponse>> AddStaff([FromBody] AddStaffRequest request)
+        {
+            return await _adminService.AddStaff(request);
+        }
+        
         
     }
 }
