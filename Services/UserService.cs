@@ -12,12 +12,14 @@ public class UserService : IUserService
     private readonly ApplicationDBContext _context;
     private readonly JwtUtils _jwtUtils;
     private readonly IConfiguration _configuration;
+    private readonly IFileService _fileService;
 
-    public UserService(ApplicationDBContext context, JwtUtils jwtUtils, IConfiguration configuration)
+    public UserService(ApplicationDBContext context, JwtUtils jwtUtils, IConfiguration configuration, IFileService fileService)
     {
         _context = context;
         _jwtUtils = jwtUtils;
         _configuration = configuration;
+        _fileService = fileService;
     }
     
     public async Task<ActionResult> EditProfile(string userId, EditProfileRequest request)
@@ -29,10 +31,23 @@ public class UserService : IUserService
         if (user == null)
             return new NotFoundObjectResult("User not found");
 
+        // Handle image upload
+        if (request.ImageFile != null)
+        {
+            // Delete old image if it exists
+            if (!string.IsNullOrEmpty(user.Image))
+            {
+                _fileService.DeleteFile(user.Image);
+            }
+            
+            // Save new image
+            string? imagePath = await _fileService.SaveFile(request.ImageFile, "users");
+            user.Image = imagePath;
+        }
+
         user.Name = request.FullName;
         user.PhoneNumber = request.PhoneNumber;
         user.Address = request.Address;
-        user.Image = request.Image;
         user.Updated = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();

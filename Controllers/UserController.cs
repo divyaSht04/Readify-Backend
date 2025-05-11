@@ -17,7 +17,7 @@ public class UserController
     }
     [HttpPut("profile/{userId}")]
     [Authorize]
-    public async Task<ActionResult> EditProfile(string userId, [FromBody] EditProfileRequest request)
+    public async Task<ActionResult> EditProfile(string userId, [FromForm] EditProfileRequest request)
     {
         return await _userService.EditProfile(userId, request);
     }
