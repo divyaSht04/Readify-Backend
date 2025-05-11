@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,7 +56,11 @@ builder.Services.AddScoped<IBookAccoladeService, BookAccoladeService>();
 // Register Booking service
 builder.Services.AddScoped<IBookingService, BookingService>();
 
+// Register User service
 builder.Services.AddScoped<IUserService, UserService>();
+
+// Register File service
+builder.Services.AddScoped<IFileService, FileService>();
 
 // Configure CORS
 builder.Services.AddCors(options =>
@@ -119,6 +124,14 @@ app.UseHttpsRedirection();
 
 // Use CORS
 app.UseCors("AllowAll");
+
+// Serve static files from the images folder
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(Directory.GetCurrentDirectory(), "images")),
+    RequestPath = "/images"
+});
 
 // Add authentication middleware before authorization
 app.UseAuthentication();

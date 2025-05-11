@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 
 namespace Backend.Dtos;
 
@@ -19,6 +20,5 @@ public class RegisterRequest
     [Required]
     public string? Address { get; set; }
     
-    [Required]
-    public string? Image { get; set; }
+    public IFormFile? ImageFile { get; set; }
 }

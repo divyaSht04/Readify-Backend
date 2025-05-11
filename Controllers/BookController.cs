@@ -31,14 +31,14 @@ public class BookController : ControllerBase
     
     [Authorize]
     [HttpPost]
-    public async Task<ActionResult<BookResponse>> CreateBook([FromBody] CreateBookRequest request)
+    public async Task<ActionResult<BookResponse>> CreateBook([FromForm] CreateBookRequest request)
     {
         return await _bookService.CreateBook(request);
     }
     
     [Authorize]
     [HttpPut("{id}")]
-    public async Task<ActionResult<BookResponse>> UpdateBook(Guid id, [FromBody] UpdateBookRequest request)
+    public async Task<ActionResult<BookResponse>> UpdateBook(Guid id, [FromForm] UpdateBookRequest request)
     {
         return await _bookService.UpdateBook(id, request);
     }
