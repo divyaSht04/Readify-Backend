@@ -10,6 +10,8 @@ public class BookResponse
     public string Author { get; set; }
     public string ISBN { get; set; }
     public decimal Price { get; set; }
+    public decimal? DiscountedPrice { get; set; } 
+    public bool OnSale { get; set; }
     public string Description { get; set; }
     public DateTime? PublishedDate { get; set; }
     public int StockQuantity { get; set; }
