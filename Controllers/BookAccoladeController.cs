@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Backend.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("/accolade")]
 public class BookAccoladeController : ControllerBase
 {
     private readonly IBookAccoladeService _accoladeService;

@@ -8,7 +8,7 @@ using System.Security.Claims;
 namespace Backend.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("/booking")]
 [Authorize]
 public class BookingController : ControllerBase
 {
