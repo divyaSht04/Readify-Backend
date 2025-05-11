@@ -14,6 +14,7 @@ public class ApplicationDBContext : DbContext
     public DbSet<BookAccolade> BookAccolades { get; set; }
     public DbSet<Booking> Bookings { get; set; }
     public DbSet<GlobalDiscount> GlobalDiscounts { get; set; }
+    public DbSet<BannerAnnouncement> BannerAnnouncements { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
