@@ -133,37 +133,50 @@ namespace Backend.Migrations
                     b.ToTable("BookAccolades");
                 });
 
-            modelBuilder.Entity("Backend.Booking", b =>
+            modelBuilder.Entity("Backend.Model.Cart", b =>
                 {
-                    b.Property<Guid>("ID")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("BookID")
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("BookingDate")
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Carts");
+                });
+
+            modelBuilder.Entity("Backend.Model.CartItem", b =>
+                {
+                    b.Property<Guid>("BookId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CartId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("integer");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("integer");
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<decimal>("TotalPrice")
-                        .HasColumnType("decimal(10,2)");
+                    b.HasKey("BookId", "CartId");
 
-                    b.Property<Guid>("UserID")
-                        .HasColumnType("uuid");
+                    b.HasIndex("CartId");
 
-                    b.HasKey("ID");
-
-                    b.HasIndex("BookID");
-
-                    b.HasIndex("UserID");
-
-                    b.ToTable("Bookings");
+                    b.ToTable("CartItems");
                 });
 
             modelBuilder.Entity("Backend.Models.BannerAnnouncement", b =>
@@ -302,28 +315,44 @@ namespace Backend.Migrations
                     b.Navigation("Book");
                 });
 
-            modelBuilder.Entity("Backend.Booking", b =>
+            modelBuilder.Entity("Backend.Model.Cart", b =>
                 {
-                    b.HasOne("Backend.Book", "Book")
+                    b.HasOne("Backend.Users", "User")
                         .WithMany()
-                        .HasForeignKey("BookID")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Backend.Users", "User")
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Backend.Model.CartItem", b =>
+                {
+                    b.HasOne("Backend.Book", "Book")
                         .WithMany()
-                        .HasForeignKey("UserID")
+                        .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Backend.Model.Cart", "Cart")
+                        .WithMany("Items")
+                        .HasForeignKey("CartId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Book");
 
-                    b.Navigation("User");
+                    b.Navigation("Cart");
                 });
 
             modelBuilder.Entity("Backend.Book", b =>
                 {
                     b.Navigation("Accolades");
+                });
+
+            modelBuilder.Entity("Backend.Model.Cart", b =>
+                {
+                    b.Navigation("Items");
                 });
 #pragma warning restore 612, 618
         }
