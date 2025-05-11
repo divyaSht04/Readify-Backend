@@ -2,6 +2,7 @@ using Backend.Model;
 using Backend.Models;
 using Microsoft.EntityFrameworkCore;
 
+
 namespace Backend.Context;
 
 public class ApplicationDBContext : DbContext
@@ -16,6 +17,7 @@ public class ApplicationDBContext : DbContext
     public DbSet<Cart> Carts { get; set; }
     public DbSet<CartItem> CartItems { get; set; }
     public DbSet<GlobalDiscount> GlobalDiscounts { get; set; }
+    public DbSet<BannerAnnouncement> BannerAnnouncements { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -25,13 +27,14 @@ public class ApplicationDBContext : DbContext
             .HasForeignKey(a => a.BookID);
             
         modelBuilder.Entity<Cart>()
-            .HasOne(c => c.User)
-            .WithMany()
-            .HasForeignKey(c => c.UserId)
-            .OnDelete(DeleteBehavior.Restrict);
+           .HasOne(c => c.User)
+           .WithMany()
+           .HasForeignKey(c => c.UserId)
+           .OnDelete(DeleteBehavior.Restrict);
             
         modelBuilder.Entity<CartItem>()
             .HasKey(ci => new { ci.BookId, ci.CartId });
+        
             
         modelBuilder.Entity<CartItem>()
             .HasOne(ci => ci.Cart)

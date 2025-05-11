@@ -19,4 +19,4 @@ public class Cart
     public virtual Users User { get; set; }
     
     public virtual ICollection<CartItem> Items { get; set; } = new List<CartItem>();
-} 
+}
