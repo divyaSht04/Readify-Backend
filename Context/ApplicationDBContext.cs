@@ -1,3 +1,4 @@
+using Backend.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Context;
@@ -12,6 +13,7 @@ public class ApplicationDBContext : DbContext
     public DbSet<Book> Books { get; set; }
     public DbSet<BookAccolade> BookAccolades { get; set; }
     public DbSet<Booking> Bookings { get; set; }
+    public DbSet<GlobalDiscount> GlobalDiscounts { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -31,5 +33,8 @@ public class ApplicationDBContext : DbContext
             .WithMany()
             .HasForeignKey(b => b.UserID)
             .OnDelete(DeleteBehavior.Restrict);
+        
+        modelBuilder.Entity<GlobalDiscount>()
+            .HasIndex(gd => new { gd.StartDate, gd.EndDate });
     }
 }
