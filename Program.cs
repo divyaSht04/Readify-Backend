@@ -53,8 +53,8 @@ builder.Services.AddScoped<IBookService, BookService>();
 // Register BookAccolade service
 builder.Services.AddScoped<IBookAccoladeService, BookAccoladeService>();
 
-// Register Booking service
-builder.Services.AddScoped<IBookingService, BookingService>();
+// Register Cart service
+builder.Services.AddScoped<ICartService, CartService>();
 
 // Register User service
 builder.Services.AddScoped<IUserService, UserService>();
