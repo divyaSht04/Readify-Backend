@@ -19,6 +19,7 @@ public class ApplicationDBContext : DbContext
     public DbSet<CartItem> CartItems { get; set; }
     public DbSet<Discount> Discounts { get; set; }
     public DbSet<BannerAnnouncement> BannerAnnouncements { get; set; }
+    public DbSet<Whitelist> Whitelists { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -51,5 +52,29 @@ public class ApplicationDBContext : DbContext
 
         modelBuilder.Entity<Discount>()
             .HasIndex(gd => new { gd.StartDate, gd.EndDate });
+
+        modelBuilder.Entity<Whitelist>()
+            .HasOne(w => w.User)
+            .WithMany()
+            .HasForeignKey(w => w.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Whitelist>()
+            .HasOne(w => w.Book)
+            .WithMany()
+            .HasForeignKey(w => w.BookId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Whitelist>()
+            .HasIndex(w => new { w.UserId, w.BookId })
+            .IsUnique();
+
+        // Configure BookId and UserId as Guid in Whitelist
+        modelBuilder.Entity<Whitelist>()
+            .Property(w => w.BookId)
+            .HasColumnType("uuid");
+        modelBuilder.Entity<Whitelist>()
+            .Property(w => w.UserId)
+            .HasColumnType("uuid");
     }
 }
