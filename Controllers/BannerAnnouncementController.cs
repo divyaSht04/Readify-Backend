@@ -8,7 +8,7 @@ using Backend.Dtos.Bannner;
 namespace Backend.Controllers
 {
     [ApiController]
-    [Route("/admin/banner-announcements")]
+    [Route("/banner-announcements")]
     [Authorize(Roles = "ADMIN")] // Restrict to admin users
     public class BannerAnnouncementController : ControllerBase
     {
