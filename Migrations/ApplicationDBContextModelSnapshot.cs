@@ -46,6 +46,10 @@ namespace Backend.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<decimal?>("DiscountedPrice")
+                        .HasColumnType("decimal(10,2)")
+                        .HasColumnName("discounted_price");
+
                     b.Property<string>("ISBN")
                         .IsRequired()
                         .HasMaxLength(13)
@@ -60,6 +64,10 @@ namespace Backend.Migrations
                     b.Property<bool>("IsComingSoon")
                         .HasColumnType("boolean")
                         .HasColumnName("is_coming_soon");
+
+                    b.Property<bool>("OnSale")
+                        .HasColumnType("boolean")
+                        .HasColumnName("on_sale");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(10,2)")
@@ -179,6 +187,46 @@ namespace Backend.Migrations
                     b.ToTable("CartItems");
                 });
 
+            modelBuilder.Entity("Backend.Model.Discount", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("BookId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DiscountName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("OnSale")
+                        .HasColumnType("boolean");
+
+                    b.Property<decimal>("Percentage")
+                        .HasColumnType("numeric");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookId");
+
+                    b.HasIndex("StartDate", "EndDate");
+
+                    b.ToTable("Discounts");
+                });
+
             modelBuilder.Entity("Backend.Model.Whitelist", b =>
                 {
                     b.Property<int>("Id")
@@ -235,41 +283,6 @@ namespace Backend.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("BannerAnnouncements");
-                });
-
-            modelBuilder.Entity("Backend.Models.GlobalDiscount", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("DiscountName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("OnSale")
-                        .HasColumnType("boolean");
-
-                    b.Property<decimal>("Percentage")
-                        .HasColumnType("numeric");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("StartDate", "EndDate");
-
-                    b.ToTable("GlobalDiscounts");
                 });
 
             modelBuilder.Entity("Backend.Users", b =>
@@ -374,6 +387,15 @@ namespace Backend.Migrations
                     b.Navigation("Book");
 
                     b.Navigation("Cart");
+                });
+
+            modelBuilder.Entity("Backend.Model.Discount", b =>
+                {
+                    b.HasOne("Backend.Book", "Book")
+                        .WithMany()
+                        .HasForeignKey("BookId");
+
+                    b.Navigation("Book");
                 });
 
             modelBuilder.Entity("Backend.Model.Whitelist", b =>
