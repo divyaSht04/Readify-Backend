@@ -12,14 +12,14 @@ namespace Backend.Controllers
     [Authorize(Roles = "ADMIN")]
     public class BannerAnnouncementController : ControllerBase
     {
-        private readonly IBannerService _bannerService;
+        private readonly BannerService _bannerService;
 
-        public BannerAnnouncementController(IBannerService bannerService)
+        public BannerAnnouncementController(BannerService bannerService)
         {
             _bannerService = bannerService;
         }
 
-       
+
         [HttpPost]
         public async Task<ActionResult<CreateBannerAnnouncementResponse>> SetBannerAnnouncement([FromBody] CreateBannerAnnouncementRequest request)
         {
@@ -27,13 +27,13 @@ namespace Backend.Controllers
             return result;
         }
 
-          [HttpDelete]
+        [HttpDelete]
         public async Task<ActionResult> RemoveBannerAnnouncement()
         {
             var result = await _bannerService.RemoveBannerAnnouncement();
             return result;
         }
-        
+
         [HttpGet]
         [AllowAnonymous]
         public async Task<ActionResult<List<CreateBannerAnnouncementResponse>>> GetActiveBannerAnnouncements()

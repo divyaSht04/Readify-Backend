@@ -16,12 +16,12 @@ namespace Backend.Controllers
         {
             _adminService = adminService;
         }
-        
+
         [HttpPost("staff")]
         public async Task<ActionResult<StaffResponse>> AddStaff([FromBody] AddStaffRequest request)
         {
             return await _adminService.AddStaff(request);
         }
-        
+
     }
 }

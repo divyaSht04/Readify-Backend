@@ -9,10 +9,10 @@ namespace Backend.Model
     {
         [Key]
         public Guid Id { get; set; }
-        
+
         [Required, Range(0, 100)]
         public decimal Percentage { get; set; }
-        
+
         [Required]
         public string DiscountName { get; set; }
 
@@ -23,9 +23,9 @@ namespace Backend.Model
         public DateTime EndDate { get; set; }
 
         public bool OnSale { get; set; } = false;
-        
+
         public Guid? BookId { get; set; }
-        
+
         [ForeignKey("BookId")]
         public virtual Book Book { get; set; }
 

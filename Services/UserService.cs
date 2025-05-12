@@ -8,7 +8,7 @@ namespace Backend.Services;
 
 public class UserService : IUserService
 {
-    
+
     private readonly ApplicationDBContext _context;
     private readonly IFileService _fileService;
 
@@ -17,7 +17,7 @@ public class UserService : IUserService
         _context = context;
         _fileService = fileService;
     }
-    
+
     public async Task<ActionResult> EditProfile(string userId, EditProfileRequest request)
     {
         if (request == null)
@@ -26,14 +26,14 @@ public class UserService : IUserService
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
         if (user == null)
             return new NotFoundObjectResult("User not found");
-        
+
         if (request.ImageFile != null)
         {
             if (!string.IsNullOrEmpty(user.Image))
             {
                 _fileService.DeleteFile(user.Image);
             }
-            
+
             string? imagePath = await _fileService.SaveFile(request.ImageFile, "users");
             user.Image = imagePath;
         }
@@ -61,4 +61,3 @@ public class UserService : IUserService
         });
     }
 }
-    

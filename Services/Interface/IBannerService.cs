@@ -1,4 +1,4 @@
-﻿using Backend.Dtos.Bannner;
+using Backend.Dtos.Bannner;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Services;

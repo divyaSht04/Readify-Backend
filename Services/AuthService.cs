@@ -69,7 +69,7 @@ public class AuthService : IAuthService
             PhoneNumber = request.PhoneNumber,
             Address = request.Address,
             Image = imagePath,
-            Role = Roles.ADMIN
+            Role = Roles.USER
         };
 
         await _context.Users.AddAsync(user);
