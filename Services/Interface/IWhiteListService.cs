@@ -5,7 +5,7 @@ namespace Backend.Services;
 
 public interface IWhiteListService
 {
-    Task<ActionResult<WhitelistResponseDto>> AddWhiteListAsync(Guid bookId, Guid userId);
-    Task<ActionResult<WhitelistResponseDto>> RemoveFromWhitelist(Guid bookId, Guid userId);
-    Task<ActionResult<WhitelistResponseDto>> GetUserWhitelist(Guid userId);
+    Task<ActionResult<BookResponse>> AddWhiteListAsync(Guid bookId, Guid userId);
+    Task<ActionResult<BookResponse>> RemoveFromWhitelist(Guid bookId, Guid userId);
+    Task<ActionResult<List<BookResponse>>> GetUserWhitelist(Guid userId);
 }

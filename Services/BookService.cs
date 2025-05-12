@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Backend.Context;
 using Backend.Dtos;
+using Backend.Model;
 using Backend.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -25,8 +26,16 @@ namespace Backend.Services
         {
             var now = DateTime.UtcNow;
             var books = await _context.Books.ToListAsync();
-            var globalDiscount = await GetActiveGlobalDiscount(now);
-            return books.Select(book => MapToBookResponse(book, now, globalDiscount)).ToList();
+            
+            // Get book-specific discounts for all books
+            var bookResponses = new List<BookResponse>();
+            foreach (var book in books)
+            {
+                var bookDiscount = await GetActiveBookDiscount(now, book.ID);
+                bookResponses.Add(MapToBookResponse(book, now, bookDiscount));
+            }
+            
+            return bookResponses;
         }
 
         public async Task<ActionResult<BookResponse>> GetBookById(Guid id)
@@ -39,8 +48,9 @@ namespace Backend.Services
                 return new NotFoundObjectResult($"Book with ID {id} not found.");
             }
 
-            var globalDiscount = await GetActiveGlobalDiscount(now);
-            return MapToBookResponse(book, now, globalDiscount);
+            // Check for book-specific discount
+            var discount = await GetActiveBookDiscount(now, id);
+            return MapToBookResponse(book, now, discount);
         }
 
         public async Task<ActionResult<BookResponse>> CreateBook(CreateBookRequest request)
@@ -77,8 +87,8 @@ namespace Backend.Services
             await _context.SaveChangesAsync();
 
             var now = DateTime.UtcNow;
-            var globalDiscount = await GetActiveGlobalDiscount(now);
-            return MapToBookResponse(book, now, globalDiscount);
+            var bookDiscount = await GetActiveBookDiscount(now, book.ID);
+            return MapToBookResponse(book, now, bookDiscount);
         }
 
         public async Task<ActionResult<BookResponse>> UpdateBook(Guid id, UpdateBookRequest request)
@@ -131,8 +141,8 @@ namespace Backend.Services
             await _context.SaveChangesAsync();
 
             var now = DateTime.UtcNow;
-            var globalDiscount = await GetActiveGlobalDiscount(now);
-            return MapToBookResponse(book, now, globalDiscount);
+            var bookDiscount = await GetActiveBookDiscount(now, book.ID);
+            return MapToBookResponse(book, now, bookDiscount);
         }
 
         public async Task<ActionResult> DeleteBook(Guid id)
@@ -165,7 +175,6 @@ namespace Backend.Services
 
             query = query.ToLower();
             var now = DateTime.UtcNow;
-            var globalDiscount = await GetActiveGlobalDiscount(now);
 
             var books = await _context.Books
                 .Where(b => b.Title.ToLower().Contains(query) ||
@@ -175,41 +184,80 @@ namespace Backend.Services
                             b.Category.Any(c => c.ToLower().Contains(query)))
                 .ToListAsync();
 
-            return books.Select(book => MapToBookResponse(book, now, globalDiscount)).ToList();
+            // Get book-specific discounts for each book
+            var bookResponses = new List<BookResponse>();
+            foreach (var book in books)
+            {
+                var bookDiscount = await GetActiveBookDiscount(now, book.ID);
+                bookResponses.Add(MapToBookResponse(book, now, bookDiscount));
+            }
+
+            return bookResponses;
         }
 
         public async Task<ActionResult<List<BookResponse>>> GetComingSoonBooks()
         {
             var now = DateTime.UtcNow;
-            var globalDiscount = await GetActiveGlobalDiscount(now);
 
             var books = await _context.Books
                 .Where(b => b.IsComingSoon)
                 .OrderBy(b => b.ReleaseDate)
                 .ToListAsync();
+            
+            var bookResponses = new List<BookResponse>();
+            foreach (var book in books)
+            {
+                var bookDiscount = await GetActiveBookDiscount(now, book.ID);
+                bookResponses.Add(MapToBookResponse(book, now, bookDiscount));
+            }
 
-            return books.Select(book => MapToBookResponse(book, now, globalDiscount)).ToList();
+            return bookResponses;
         }
-
-        // Helper method to get the active global discount
-        private async Task<GlobalDiscount?> GetActiveGlobalDiscount(DateTime now)
+        
+        private async Task<Discount?> GetActiveBookDiscount(DateTime now, Guid bookId)
         {
-            return await _context.GlobalDiscounts
-                .Where(gd => gd.StartDate <= now && gd.EndDate >= now)
-                .OrderByDescending(gd => gd.CreatedAt) // Take the most recent discount if multiple overlap
+            // Get book-specific discount
+            return await _context.Discounts
+                .Where(d => d.BookId == bookId && d.StartDate <= now && d.EndDate >= now)
+                .OrderByDescending(d => d.CreatedAt) // Take the most recent discount if multiple overlap
                 .FirstOrDefaultAsync();
         }
-
-        // Helper method to map from Book entity to BookResponse DTO
-        private static BookResponse MapToBookResponse(Book book, DateTime now, GlobalDiscount? globalDiscount)
+        
+        public async Task<ActionResult<DiscountResponse>?> GetBookDiscount(Guid bookId)
+        {
+            var now = DateTime.UtcNow;
+            var discount = await GetActiveBookDiscount(now, bookId);
+            
+            if (discount == null)
+            {
+                return null;
+            }
+            
+            return new DiscountResponse
+            {
+                Id = discount.Id,
+                DiscountName = discount.DiscountName,
+                Percentage = discount.Percentage,
+                StartDate = discount.StartDate,
+                EndDate = discount.EndDate,
+                OnSale = discount.OnSale,
+                BookId = discount.BookId,
+                CreatedAt = discount.CreatedAt,
+                UpdatedAt = discount.UpdatedAt
+            };
+        }
+        
+        private static BookResponse MapToBookResponse(Book book, DateTime now, Discount? globalDiscount)
         {
             decimal? discountedPrice = null;
+            decimal discountPercentage = 0;
             bool onSale = false;
 
             if (globalDiscount != null)
             {
                 discountedPrice = book.Price - (book.Price * (globalDiscount.Percentage / 100));
                 onSale = globalDiscount.OnSale;
+                discountPercentage = globalDiscount.Percentage;
             }
 
             return new BookResponse
@@ -229,7 +277,8 @@ namespace Backend.Services
                 CreatedAt = book.CreatedAt,
                 UpdatedAt = book.UpdatedAt,
                 Category = book.Category,
-                Image = book.Image
+                Image = book.Image,
+                DiscountPercentage = discountPercentage,
             };
         }
     }
