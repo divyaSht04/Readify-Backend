@@ -64,6 +64,9 @@ builder.Services.AddScoped<IFileService, FileService>();
 
 builder.Services.AddScoped<AdminService>();
 
+//Banner announcement service
+builder.Services.AddScoped<IBannerService, BannerService>();
+
 // Configure CORS
 builder.Services.AddCors(options =>
 {

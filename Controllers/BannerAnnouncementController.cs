@@ -1,4 +1,4 @@
-using Backend.Dtos;
+
 using Backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,38 +8,36 @@ using Backend.Dtos.Bannner;
 namespace Backend.Controllers
 {
     [ApiController]
-    [Route("/admin/banner-announcements")]
-    [Authorize(Roles = "ADMIN")] // Restrict to admin users
+    [Route("banner-announcements")]
+    [Authorize(Roles = "ADMIN")]
     public class BannerAnnouncementController : ControllerBase
     {
-        private readonly AdminService _adminService;
+        private readonly IBannerService _bannerService;
 
-        public BannerAnnouncementController(AdminService adminService)
+        public BannerAnnouncementController(IBannerService bannerService)
         {
-            _adminService = adminService;
+            _bannerService = bannerService ?? throw new ArgumentNullException(nameof(bannerService));
         }
 
-       
         [HttpPost]
         public async Task<ActionResult<CreateBannerAnnouncementResponse>> SetBannerAnnouncement([FromBody] CreateBannerAnnouncementRequest request)
         {
-            var result = await _adminService.SetBannerAnnouncement(request);
+            var result = await _bannerService.SetBannerAnnouncement(request);
             return result;
         }
 
-          [HttpDelete]
+        [HttpDelete]
         public async Task<ActionResult> RemoveBannerAnnouncement()
         {
-            var result = await _adminService.RemoveBannerAnnouncement();
+            var result = await _bannerService.RemoveBannerAnnouncement();
             return result;
         }
 
-        
         [HttpGet]
-        [AllowAnonymous] // Allow public access to view active announcements
+        [AllowAnonymous]
         public async Task<ActionResult<List<CreateBannerAnnouncementResponse>>> GetActiveBannerAnnouncements()
         {
-            var result = await _adminService.GetActiveBannerAnnouncements();
+            var result = await _bannerService.GetActiveBannerAnnouncements();
             return result;
         }
     }
