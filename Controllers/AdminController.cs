@@ -17,24 +17,11 @@ namespace Backend.Controllers
             _adminService = adminService;
         }
 
-        [HttpPost("global-discount")]
-        public async Task<ActionResult<GlobalDiscountResponse>> SetGlobalDiscount([FromBody] CreateGlobalDiscountRequest request)
-        {
-            return await _adminService.SetGlobalDiscount(request);
-        }
-        
-        [HttpDelete("global-discount")]
-        public async Task<ActionResult> RemoveGlobalDiscount()
-        {
-            return await _adminService.RemoveGlobalDiscount();
-        }
-        
         [HttpPost("staff")]
         public async Task<ActionResult<StaffResponse>> AddStaff([FromBody] AddStaffRequest request)
         {
             return await _adminService.AddStaff(request);
         }
-        
-        
+
     }
 }

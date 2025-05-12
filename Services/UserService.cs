@@ -8,20 +8,16 @@ namespace Backend.Services;
 
 public class UserService : IUserService
 {
-    
+
     private readonly ApplicationDBContext _context;
-    private readonly JwtUtils _jwtUtils;
-    private readonly IConfiguration _configuration;
     private readonly IFileService _fileService;
 
-    public UserService(ApplicationDBContext context, JwtUtils jwtUtils, IConfiguration configuration, IFileService fileService)
+    public UserService(ApplicationDBContext context, IFileService fileService)
     {
         _context = context;
-        _jwtUtils = jwtUtils;
-        _configuration = configuration;
         _fileService = fileService;
     }
-    
+
     public async Task<ActionResult> EditProfile(string userId, EditProfileRequest request)
     {
         if (request == null)
@@ -31,16 +27,13 @@ public class UserService : IUserService
         if (user == null)
             return new NotFoundObjectResult("User not found");
 
-        // Handle image upload
         if (request.ImageFile != null)
         {
-            // Delete old image if it exists
             if (!string.IsNullOrEmpty(user.Image))
             {
                 _fileService.DeleteFile(user.Image);
             }
-            
-            // Save new image
+
             string? imagePath = await _fileService.SaveFile(request.ImageFile, "users");
             user.Image = imagePath;
         }
@@ -68,4 +61,3 @@ public class UserService : IUserService
         });
     }
 }
-    
