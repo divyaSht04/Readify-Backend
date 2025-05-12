@@ -1,4 +1,4 @@
-
+using Backend.Dtos;
 using Backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,16 +8,17 @@ using Backend.Dtos.Bannner;
 namespace Backend.Controllers
 {
     [ApiController]
-    [Route("banner-announcements")]
+    [Route("/banner-announcements")]
     [Authorize(Roles = "ADMIN")]
     public class BannerAnnouncementController : ControllerBase
     {
-        private readonly IBannerService _bannerService;
+        private readonly BannerService _bannerService;
 
-        public BannerAnnouncementController(IBannerService bannerService)
+        public BannerAnnouncementController(BannerService bannerService)
         {
-            _bannerService = bannerService ?? throw new ArgumentNullException(nameof(bannerService));
+            _bannerService = bannerService;
         }
+
 
         [HttpPost]
         public async Task<ActionResult<CreateBannerAnnouncementResponse>> SetBannerAnnouncement([FromBody] CreateBannerAnnouncementRequest request)
