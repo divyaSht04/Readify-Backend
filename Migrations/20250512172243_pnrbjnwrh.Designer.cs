@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Backend.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20250512163914_order-checkout")]
-    partial class ordercheckout
+    [Migration("20250512172243_pnrbjnwrh")]
+    partial class pnrbjnwrh
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
