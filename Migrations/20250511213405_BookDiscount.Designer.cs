@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Backend.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20250511194845_Cart_Banner")]
-    partial class Cart_Banner
+    [Migration("20250511213405_BookDiscount")]
+    partial class BookDiscount
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -134,6 +134,52 @@ namespace Backend.Migrations
                     b.HasIndex("BookID");
 
                     b.ToTable("BookAccolades");
+                });
+
+            modelBuilder.Entity("Backend.BookDiscount", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("BookID")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("DiscountName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<decimal>("DiscountPercentage")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("BookID");
+
+                    b.HasIndex("StartDate", "EndDate");
+
+                    b.ToTable("BookDiscounts");
                 });
 
             modelBuilder.Entity("Backend.Model.Cart", b =>
@@ -322,6 +368,17 @@ namespace Backend.Migrations
                     b.Navigation("Book");
                 });
 
+            modelBuilder.Entity("Backend.BookDiscount", b =>
+                {
+                    b.HasOne("Backend.Book", "Book")
+                        .WithMany("Discounts")
+                        .HasForeignKey("BookID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Book");
+                });
+
             modelBuilder.Entity("Backend.Model.Cart", b =>
                 {
                     b.HasOne("Backend.Users", "User")
@@ -355,6 +412,8 @@ namespace Backend.Migrations
             modelBuilder.Entity("Backend.Book", b =>
                 {
                     b.Navigation("Accolades");
+
+                    b.Navigation("Discounts");
                 });
 
             modelBuilder.Entity("Backend.Model.Cart", b =>

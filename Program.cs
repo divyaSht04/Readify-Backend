@@ -62,6 +62,10 @@ builder.Services.AddScoped<IUserService, UserService>();
 // Register File service
 builder.Services.AddScoped<IFileService, FileService>();
 
+builder.Services.AddScoped<IDiscountService, DiscountService>();
+
+builder.Services.AddScoped<IBannerService, BannerService>();
+
 builder.Services.AddScoped<AdminService>();
 
 // Configure CORS

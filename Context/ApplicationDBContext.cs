@@ -16,7 +16,7 @@ public class ApplicationDBContext : DbContext
     public DbSet<BookAccolade> BookAccolades { get; set; }
     public DbSet<Cart> Carts { get; set; }
     public DbSet<CartItem> CartItems { get; set; }
-    public DbSet<GlobalDiscount> GlobalDiscounts { get; set; }
+    public DbSet<Discount> Discounts { get; set; }
     public DbSet<BannerAnnouncement> BannerAnnouncements { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -48,7 +48,7 @@ public class ApplicationDBContext : DbContext
             .HasForeignKey(ci => ci.BookId)
             .OnDelete(DeleteBehavior.Restrict);
         
-        modelBuilder.Entity<GlobalDiscount>()
+        modelBuilder.Entity<Discount>()
             .HasIndex(gd => new { gd.StartDate, gd.EndDate });
     }
 }

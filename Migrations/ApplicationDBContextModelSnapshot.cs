@@ -210,10 +210,13 @@ namespace Backend.Migrations
                     b.ToTable("BannerAnnouncements");
                 });
 
-            modelBuilder.Entity("Backend.Models.GlobalDiscount", b =>
+            modelBuilder.Entity("Backend.Models.Discount", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("BookId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
@@ -240,9 +243,11 @@ namespace Backend.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("BookId");
+
                     b.HasIndex("StartDate", "EndDate");
 
-                    b.ToTable("GlobalDiscounts");
+                    b.ToTable("Discounts");
                 });
 
             modelBuilder.Entity("Backend.Users", b =>
@@ -347,6 +352,15 @@ namespace Backend.Migrations
                     b.Navigation("Book");
 
                     b.Navigation("Cart");
+                });
+
+            modelBuilder.Entity("Backend.Models.Discount", b =>
+                {
+                    b.HasOne("Backend.Book", "Book")
+                        .WithMany()
+                        .HasForeignKey("BookId");
+
+                    b.Navigation("Book");
                 });
 
             modelBuilder.Entity("Backend.Book", b =>

@@ -8,6 +8,5 @@ namespace Backend.Dtos
         public string Email { get; set; }
         public string Role { get; set; }
         public DateTime CreatedAt { get; set; }
-        public string? RefreshToken { get; set; }
     }
 }
