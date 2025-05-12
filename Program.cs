@@ -59,6 +59,8 @@ builder.Services.AddScoped<ICartService, CartService>();
 // Register User service
 builder.Services.AddScoped<IUserService, UserService>();
 
+builder.Services.AddScoped<IWhiteListService, WhiteListService>();
+
 // Register File service
 builder.Services.AddScoped<IFileService, FileService>();
 

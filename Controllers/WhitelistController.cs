@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using Backend.Services;
 
 namespace Backend.Controllers;
 
@@ -14,80 +15,29 @@ namespace Backend.Controllers;
 public class WhitelistController : ControllerBase
 {
     private readonly ApplicationDBContext _context;
+    private readonly IWhiteListService _whiteListService;
 
-    public WhitelistController(ApplicationDBContext context)
+    public WhitelistController(ApplicationDBContext context, IWhiteListService whiteListService)
     {
         _context = context;
+        _whiteListService = whiteListService;
     }
 
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<WhitelistResponseDto>>> GetUserWhitelist([FromQuery] Guid userId)
+    [HttpGet("userId/{userId}")]
+    public async Task<ActionResult<WhitelistResponseDto>> GetUserWhitelist(Guid userId)
     {
-        var whitelist = await _context.Whitelists
-            .Include(w => w.Book)
-            .Where(w => w.UserId == userId)
-            .Select(w => new WhitelistResponseDto
-            {
-                Id = w.Id,
-                BookId = w.BookId,
-                BookTitle = w.Book!.Title,
-                BookAuthor = w.Book.Author,
-                BookImage = w.Book.Image,
-                CreatedAt = w.CreatedAt
-            })
-            .OrderByDescending(w => w.CreatedAt)
-            .ToListAsync();
-
-        return Ok(whitelist);
+        return await _whiteListService.GetUserWhitelist(userId);
     }
 
-    [HttpPost]
-    public async Task<ActionResult<WhitelistResponseDto>> AddToWhitelist([FromQuery] Guid userId, [FromForm] AddToWhitelistDto dto)
+    [HttpPost("/bookId/{bookId}/userId/{userId}")]
+    public async Task<ActionResult<WhitelistResponseDto>> AddToWhitelist(Guid bookId, Guid userId)
     {
-        // Check if book exists
-        var book = await _context.Books.FindAsync(dto.BookId);
-        if (book == null)
-            return NotFound("Book not found");
-
-        // Check if already in whitelist
-        var existingWhitelist = await _context.Whitelists
-            .FirstOrDefaultAsync(w => w.UserId == userId && w.BookId == dto.BookId);
-        
-        if (existingWhitelist != null)
-            return BadRequest("Book is already in whitelist");
-
-        var whitelist = new Whitelist
-        {
-            UserId = userId,
-            BookId = dto.BookId
-        };
-
-        _context.Whitelists.Add(whitelist);
-        await _context.SaveChangesAsync();
-
-        return Ok(new WhitelistResponseDto
-        {
-            Id = whitelist.Id,
-            BookId = book.ID,
-            BookTitle = book.Title,
-            BookAuthor = book.Author,
-            BookImage = book.Image,
-            CreatedAt = whitelist.CreatedAt
-        });
+        return await _whiteListService.AddWhiteListAsync(bookId, userId);
     }
 
-    [HttpDelete("{bookId}")]
-    public async Task<IActionResult> RemoveFromWhitelist(Guid bookId, [FromQuery] Guid userId)
+    [HttpDelete("{bookId}/user/{userId}")]
+    public async Task<ActionResult<WhitelistResponseDto>> RemoveFromWhitelist(Guid bookId, Guid userId)
     {
-        var whitelist = await _context.Whitelists
-            .FirstOrDefaultAsync(w => w.UserId == userId && w.BookId == bookId);
-        
-        if (whitelist == null)
-            return NotFound("Book not found in whitelist");
-
-        _context.Whitelists.Remove(whitelist);
-        await _context.SaveChangesAsync();
-
-        return NoContent();
+       return await _whiteListService.AddWhiteListAsync(bookId, userId);
     }
 } 
