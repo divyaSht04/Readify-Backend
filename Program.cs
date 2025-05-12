@@ -68,7 +68,7 @@ builder.Services.AddScoped<IDiscountService, DiscountService>();
 
 builder.Services.AddScoped<IBannerService, BannerService>();
 
-builder.Services.AddScoped<IBookService, BookService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 
 builder.Services.AddScoped<IEmailService, EmailService>();
 
