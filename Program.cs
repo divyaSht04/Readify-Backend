@@ -68,6 +68,10 @@ builder.Services.AddScoped<IDiscountService, DiscountService>();
 
 builder.Services.AddScoped<IBannerService, BannerService>();
 
+builder.Services.AddScoped<IBookService, BookService>();
+
+builder.Services.AddScoped<IEmailService, EmailService>();
+
 builder.Services.AddScoped<AdminService>();
 
 // Configure CORS
