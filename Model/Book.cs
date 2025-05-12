@@ -2,6 +2,7 @@ namespace Backend;
 
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Backend.Model;
 
 public class Book
 {
@@ -53,4 +54,6 @@ public class Book
     public bool OnSale { get; set; }
 
     public virtual ICollection<BookAccolade> Accolades { get; set; }
+    
+    public virtual ICollection<BookReview> Reviews { get; set; }
 }
