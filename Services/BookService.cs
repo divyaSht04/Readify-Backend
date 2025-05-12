@@ -31,7 +31,6 @@ namespace Backend.Services
             var bookResponses = new List<BookResponse>();
             foreach (var book in books)
             {
-                // Check for book-specific discount
                 var bookDiscount = await GetActiveBookDiscount(now, book.ID);
                 bookResponses.Add(MapToBookResponse(book, now, bookDiscount));
             }
@@ -226,12 +225,14 @@ namespace Backend.Services
         private static BookResponse MapToBookResponse(Book book, DateTime now, Discount? globalDiscount)
         {
             decimal? discountedPrice = null;
+            decimal discountPercentage = 0;
             bool onSale = false;
 
             if (globalDiscount != null)
             {
                 discountedPrice = book.Price - (book.Price * (globalDiscount.Percentage / 100));
                 onSale = globalDiscount.OnSale;
+                discountPercentage = globalDiscount.Percentage;
             }
 
             return new BookResponse
@@ -251,7 +252,8 @@ namespace Backend.Services
                 CreatedAt = book.CreatedAt,
                 UpdatedAt = book.UpdatedAt,
                 Category = book.Category,
-                Image = book.Image
+                Image = book.Image,
+                DiscountPercentage = discountPercentage,
             };
         }
     }

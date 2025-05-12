@@ -10,11 +10,23 @@ namespace Backend.Controllers;
 [Authorize(Roles = "ADMIN")]
 public class DiscountController
 {
-    private readonly DiscountService _discountService;
+    private readonly IDiscountService _discountService;
 
-    public DiscountController(DiscountService discountService)
+    public DiscountController(IDiscountService discountService)
     {
         _discountService = discountService;
+    }
+
+    [HttpGet]
+    public async Task<ActionResult<List<DiscountResponse>>> GetAllDiscounts()
+    {
+        return await _discountService.GetAllDiscounts();
+    }
+
+    [HttpGet("{id}")]
+    public async Task<ActionResult<DiscountResponse>> GetDiscountById(Guid id)
+    {
+        return await _discountService.GetDiscountById(id);
     }
 
     [HttpPost("/book/{bookId}")]
@@ -27,5 +39,17 @@ public class DiscountController
     public async Task<ActionResult> RemoveBookDiscount(Guid bookId)
     {
         return await _discountService.RemoveBookDiscount(bookId);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> DeleteDiscount(Guid id)
+    {
+        return await _discountService.DeleteDiscount(id);
+    }
+
+    [HttpPut("{id}")]
+    public async Task<ActionResult<DiscountResponse>> UpdateDiscount(Guid id, [FromBody] CreateDiscountRequest request)
+    {
+        return await _discountService.UpdateDiscount(id, request);
     }
 }
