@@ -10,8 +10,7 @@ namespace Backend.Model
         [Key]
         public Guid Id { get; set; }
 
-        [Required, Range(0, 100)]
-        public decimal Percentage { get; set; }
+        [Required, Range(0, 100)] public decimal Percentage { get; set; } = 0;
 
         [Required]
         public string DiscountName { get; set; }
