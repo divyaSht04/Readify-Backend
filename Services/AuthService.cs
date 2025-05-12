@@ -69,7 +69,7 @@ public class AuthService : IAuthService
             PhoneNumber = request.PhoneNumber,
             Address = request.Address,
             Image = imagePath,
-            Role = Roles.USER
+            Role = Roles.ADMIN
         };
 
         await _context.Users.AddAsync(user);
@@ -134,14 +134,13 @@ public class AuthService : IAuthService
         // Trim inputs to handle potential whitespace
         var currentPassword = request.CurrentPassword?.Trim();
         var newPassword = request.NewPassword?.Trim();
-
-        // Verify current password
+        
         if (!BCrypt.Net.BCrypt.Verify(currentPassword, user.Password))
             return new UnauthorizedObjectResult("Current password is incorrect");
 
         // Check if new password is different
         if (currentPassword == newPassword)
-            return new BadRequestObjectResult("New password must be different from the current password");
+            return new BadRequestObjectResult("New password must be different from the current password !");
 
         // Hash new password
         user.Password = BCrypt.Net.BCrypt.HashPassword(newPassword);
