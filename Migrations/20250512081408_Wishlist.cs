@@ -8,7 +8,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Backend.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class Wishlist : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -47,29 +47,13 @@ namespace Backend.Migrations
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Category = table.Column<List<string>>(type: "text[]", nullable: false),
-                    image = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true)
+                    image = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    discounted_price = table.Column<decimal>(type: "numeric(10,2)", nullable: true),
+                    on_sale = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Books", x => x.ID);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "GlobalDiscounts",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Percentage = table.Column<decimal>(type: "numeric", nullable: false),
-                    DiscountName = table.Column<string>(type: "text", nullable: false),
-                    StartDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    EndDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    OnSale = table.Column<bool>(type: "boolean", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_GlobalDiscounts", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -117,6 +101,30 @@ namespace Backend.Migrations
                         principalTable: "Books",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Discounts",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Percentage = table.Column<decimal>(type: "numeric", nullable: false),
+                    DiscountName = table.Column<string>(type: "text", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    OnSale = table.Column<bool>(type: "boolean", nullable: false),
+                    BookId = table.Column<Guid>(type: "uuid", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Discounts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Discounts_Books_BookId",
+                        column: x => x.BookId,
+                        principalTable: "Books",
+                        principalColumn: "ID");
                 });
 
             migrationBuilder.CreateTable(
@@ -209,8 +217,13 @@ namespace Backend.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_GlobalDiscounts_StartDate_EndDate",
-                table: "GlobalDiscounts",
+                name: "IX_Discounts_BookId",
+                table: "Discounts",
+                column: "BookId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Discounts_StartDate_EndDate",
+                table: "Discounts",
                 columns: new[] { "StartDate", "EndDate" });
 
             migrationBuilder.CreateIndex(
@@ -238,7 +251,7 @@ namespace Backend.Migrations
                 name: "CartItems");
 
             migrationBuilder.DropTable(
-                name: "GlobalDiscounts");
+                name: "Discounts");
 
             migrationBuilder.DropTable(
                 name: "Whitelists");

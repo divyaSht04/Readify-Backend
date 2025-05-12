@@ -46,5 +46,11 @@ public class Book
     [Column("image"), MaxLength(255)]
     public string? Image { get; set; }
 
+    [Column(name: "discounted_price", TypeName = "decimal(10,2)")]
+    public decimal? DiscountedPrice { get; set; }
+
+    [Column(name: "on_sale")]
+    public bool OnSale { get; set; }
+
     public virtual ICollection<BookAccolade> Accolades { get; set; }
 }
