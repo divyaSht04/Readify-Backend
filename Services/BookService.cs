@@ -12,10 +12,12 @@ namespace Backend.Services;
 public class BookService : IBookService
 {
     private readonly ApplicationDBContext _context;
+    private readonly IFileService _fileService;
 
-    public BookService(ApplicationDBContext context)
+    public BookService(ApplicationDBContext context, IFileService fileService)
     {
         _context = context;
+        _fileService = fileService;
     }
 
     public async Task<ActionResult<List<BookResponse>>> GetAllBooks()
@@ -38,6 +40,12 @@ public class BookService : IBookService
 
     public async Task<ActionResult<BookResponse>> CreateBook(CreateBookRequest request)
     {
+        string? imagePath = null;
+        if (request.ImageFile != null)
+        {
+            imagePath = await _fileService.SaveFile(request.ImageFile, "books");
+        }
+
         var book = new Book
         {
             ID = Guid.NewGuid(),
@@ -55,6 +63,7 @@ public class BookService : IBookService
                 ? DateTime.SpecifyKind(request.ReleaseDate.Value, DateTimeKind.Utc)
                 : null,
             Category = request.Category,
+            Image = imagePath,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
@@ -74,13 +83,26 @@ public class BookService : IBookService
             return new NotFoundObjectResult($"Book with ID {id} not found.");
         }
 
+        // Handle image upload
+        if (request.ImageFile != null)
+        {
+            // Delete old image if it exists
+            if (!string.IsNullOrEmpty(book.Image))
+            {
+                _fileService.DeleteFile(book.Image);
+            }
+            
+            // Save new image
+            string? imagePath = await _fileService.SaveFile(request.ImageFile, "books");
+            book.Image = imagePath;
+        }
+
         // Update only the properties that are provided
         if (request.Title != null)
             book.Title = request.Title;
 
         if (request.Author != null)
             book.Author = request.Author;
-
 
         if (request.ISBN != null)
             book.ISBN = request.ISBN;
@@ -120,6 +142,12 @@ public class BookService : IBookService
         if (book == null)
         {
             return new NotFoundObjectResult($"Book with ID {id} not found.");
+        }
+
+        // Delete associated image if it exists
+        if (!string.IsNullOrEmpty(book.Image))
+        {
+            _fileService.DeleteFile(book.Image);
         }
 
         _context.Books.Remove(book);
@@ -175,7 +203,8 @@ public class BookService : IBookService
             ReleaseDate = book.ReleaseDate,
             CreatedAt = book.CreatedAt,
             UpdatedAt = book.UpdatedAt,
-            Category = book.Category
+            Category = book.Category,
+            Image = book.Image
         };
     }
 }

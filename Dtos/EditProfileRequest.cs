@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 
 namespace Backend.Dtos;
 
@@ -13,6 +14,5 @@ public class EditProfileRequest
     [Required, MaxLength(100)]
     public string Address { get; set; }
 
-    [MaxLength(100)]
-    public string? Image { get; set; }
+    public IFormFile? ImageFile { get; set; }
 }

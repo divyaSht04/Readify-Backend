@@ -43,5 +43,8 @@ public class Book
     
     public List<string> Category { get; set; }
     
+    [Column("image"), MaxLength(255)]
+    public string? Image { get; set; }
+    
     public virtual ICollection<BookAccolade> Accolades { get; set; }
 }

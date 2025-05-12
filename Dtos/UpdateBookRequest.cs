@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 
 namespace Backend.Dtos;
 
@@ -28,4 +29,6 @@ public class UpdateBookRequest
     public DateTime? ReleaseDate { get; set; }
     
     public List<string> Category { get; set; }
+    
+    public IFormFile? ImageFile { get; set; }
 }
