@@ -7,4 +7,5 @@ public interface IOrderService
 {
     Task<ActionResult<OrderResponse>> CreateOrderFromCart(Guid userId);
     Task<ActionResult<OrderResponse>> GetOrderByClaimCode(string claimCode);
+    Task<ActionResult<OrderResponse>> VerifyOrderByClaimCode(string claimCode);
 }

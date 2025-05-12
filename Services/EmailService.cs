@@ -42,6 +42,26 @@ public class EmailService : IEmailService
         await client.SendMailAsync(message);
     }
 
+    public async Task SendOrderVerificationEmailAsync(string toEmail, string claimCode, decimal totalAmount, List<OrderItemResponse> items)
+    {
+        using var client = new SmtpClient(_smtpServer, _smtpPort)
+        {
+            Credentials = new System.Net.NetworkCredential(_smtpUsername, _smtpPassword),
+            EnableSsl = true
+        };
+
+        var message = new MailMessage
+        {
+            From = new MailAddress(_fromEmail),
+            Subject = "Order Verified - Readify",
+            Body = GenerateVerificationEmailBody(claimCode, totalAmount, items),
+            IsBodyHtml = true
+        };
+        message.To.Add(toEmail);
+
+        await client.SendMailAsync(message);
+    }
+
     private string GenerateEmailBody(string claimCode, decimal totalAmount, List<OrderItemResponse> items)
     {
         var itemsHtml = string.Join("", items.Select(item => $@"
@@ -74,6 +94,43 @@ public class EmailService : IEmailService
                     </table>
                     
                     <p>Please keep this claim code for your records. You will need it to claim your books.</p>
+                    <p>Thank you for choosing Readify!</p>
+                </body>
+            </html>";
+    }
+
+    private string GenerateVerificationEmailBody(string claimCode, decimal totalAmount, List<OrderItemResponse> items)
+    {
+        var itemsHtml = string.Join("", items.Select(item => $@"
+            <tr>
+                <td>{item.BookTitle}</td>
+                <td>{item.BookAuthor}</td>
+                <td>{item.Quantity}</td>
+                <td>${item.UnitPrice:F2}</td>
+                <td>${item.TotalPrice:F2}</td>
+            </tr>"));
+
+        return $@"
+            <html>
+                <body style='font-family: Arial, sans-serif;'>
+                    <h2>Your Order Has Been Verified!</h2>
+                    <p>Your order has been successfully verified by our staff and is being processed.</p>
+                    <p><strong>Claim Code:</strong> {claimCode}</p>
+                    <p><strong>Total Amount:</strong> ${totalAmount:F2}</p>
+                    
+                    <h3>Order Details:</h3>
+                    <table border='1' cellpadding='5' style='border-collapse: collapse;'>
+                        <tr style='background-color: #f2f2f2;'>
+                            <th>Book Title</th>
+                            <th>Author</th>
+                            <th>Quantity</th>
+                            <th>Unit Price</th>
+                            <th>Total</th>
+                        </tr>
+                        {itemsHtml}
+                    </table>
+                    
+                    <p>Your books are now ready for pickup or delivery as per your selection.</p>
                     <p>Thank you for choosing Readify!</p>
                 </body>
             </html>";

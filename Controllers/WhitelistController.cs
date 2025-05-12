@@ -29,7 +29,7 @@ public class WhitelistController : ControllerBase
         return await _whiteListService.GetUserWhitelist(userId);
     }
 
-    [HttpPost("/bookId/{bookId}/userId/{userId}")]
+    [HttpPost("bookId/{bookId}/userId/{userId}")]
     public async Task<ActionResult<BookResponse>> AddToWhitelist(Guid bookId, Guid userId)
     {
         return await _whiteListService.AddWhiteListAsync(bookId, userId);

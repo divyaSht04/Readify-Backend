@@ -29,4 +29,9 @@ public class OrderController
         return await _orderService.GetOrderByClaimCode(claimCode);
     }
     
+    [HttpPost("verify/{claimCode}")]
+    public async Task<ActionResult<OrderResponse>> VerifyOrderByClaimCode(string claimCode)
+    {
+        return await _orderService.VerifyOrderByClaimCode(claimCode);
+    }
 }
