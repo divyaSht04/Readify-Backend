@@ -35,6 +35,11 @@ namespace Backend.Controllers
             return await _adminService.AddStaff(request);
         }
         
-        
+        [HttpGet("staff")]
+        public async Task<ActionResult<List<StaffResponse>>> GetAllStaff()
+        {
+            return await _adminService.GetAllStaff(); // This should be implemented in your service
+        }
+
     }
 }
