@@ -20,6 +20,9 @@ public class ApplicationDBContext : DbContext
     public DbSet<Discount> Discounts { get; set; }
     public DbSet<BannerAnnouncement> BannerAnnouncements { get; set; }
     public DbSet<Whitelist> Whitelists { get; set; }
+    
+    public DbSet<Order> Orders { get; set; }
+    public DbSet<OrderItem> OrderItems { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

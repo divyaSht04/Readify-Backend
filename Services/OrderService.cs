@@ -1,7 +1,9 @@
 using Backend.Context;
 using Backend.Dtos.Order;
 using Backend.Model;
+using Backend.Utils;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Services;
 
@@ -9,11 +11,13 @@ public class OrderService : IOrderService
 {
     private readonly ApplicationDBContext _context;
     private readonly ICartService _cartService;
+    private readonly IEmailService _emailService;
 
-    public OrderService(ApplicationDBContext context, ICartService cartService)
+    public OrderService(ApplicationDBContext context, ICartService cartService, IEmailService emailService)
     {
         _context = context;
         _cartService = cartService;
+        _emailService = emailService;
     }
 
     public async Task<ActionResult<OrderResponse>> CreateOrderFromCart(Guid userId)
@@ -36,7 +40,7 @@ public class OrderService : IOrderService
             return new NotFoundObjectResult("User not found");
         }
         
-        var claimCode = GenerateClaimCode();
+        var claimCode = ClaimCodeUtil.GenerateClaimCode();
         
         var order = new Order
         {
@@ -104,6 +108,21 @@ public class OrderService : IOrderService
                 UpdatedAt = i.UpdatedAt
             }).ToList()
         );
+
+        return await MapToOrderResponse(order);
+    }
+    
+    public async Task<ActionResult<OrderResponse>> GetOrderByClaimCode(string claimCode)
+    {
+        var order = await _context.Orders
+            .Include(o => o.Items)
+            .ThenInclude(i => i.Book)
+            .FirstOrDefaultAsync(o => o.ClaimCode == claimCode);
+
+        if (order == null)
+        {
+            return new NotFoundObjectResult($"Order with claim code {claimCode} not found");
+        }
 
         return await MapToOrderResponse(order);
     }
