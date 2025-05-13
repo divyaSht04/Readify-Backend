@@ -183,10 +183,13 @@ public class CartService : ICartService
             UserId = cart.UserId,
             Items = new List<CartItemResponse>(),
             CreatedAt = cart.CreatedAt,
-            UpdatedAt = cart.UpdatedAt
+            UpdatedAt = cart.UpdatedAt,
+            HasVolumeDiscount = false,
+            VolumeDiscountMessage = string.Empty
         };
         
         decimal totalPrice = 0;
+        int totalQuantity = 0;
         
         foreach (var item in cart.Items)
         {
@@ -208,6 +211,7 @@ public class CartService : ICartService
             // Calculate total price for this item (using discounted price if available)
             decimal itemTotalPrice = effectivePrice * item.Quantity;
             totalPrice += itemTotalPrice;
+            totalQuantity += item.Quantity;
             
             cartResponse.Items.Add(new CartItemResponse
             {
@@ -223,6 +227,18 @@ public class CartService : ICartService
                 CreatedAt = item.CreatedAt,
                 UpdatedAt = item.UpdatedAt
             });
+        }
+        
+        // Store the original total price before volume discount
+        cartResponse.OriginalTotalPrice = totalPrice;
+        
+        // Apply 5% volume discount if total quantity is 5 or more
+        if (totalQuantity >= 5)
+        {
+            cartResponse.HasVolumeDiscount = true;
+            cartResponse.VolumeDiscountAmount = Math.Round(totalPrice * 0.05m, 2);
+            totalPrice = totalPrice - cartResponse.VolumeDiscountAmount;
+            cartResponse.VolumeDiscountMessage = $"5% discount applied for ordering {totalQuantity} books!";
         }
         
         cartResponse.TotalPrice = totalPrice;
