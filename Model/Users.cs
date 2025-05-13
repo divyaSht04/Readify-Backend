@@ -50,4 +50,5 @@ public class Users
     
     [Column("refresh_token_expiry")]
     public DateTime? RefreshTokenExpiryTime { get; set; }
+    public bool IsActive { get; set; } = true;
 }

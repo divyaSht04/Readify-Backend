@@ -56,5 +56,98 @@ namespace Backend.Services
                 CreatedAt = staff.Created,
             };
         }
+        public async Task<ActionResult<StaffResponse>> GetStaff(string staffId)
+        {
+            if (string.IsNullOrEmpty(staffId))
+            {
+                return new BadRequestObjectResult("Staff ID is required.");
+            }
+
+            if (!Guid.TryParse(staffId, out Guid id))
+            {
+                return new BadRequestObjectResult("Invalid staff ID format.");
+            }
+
+            var staff = await _context.Users
+                .FirstOrDefaultAsync(u => u.Id == id && u.Role == Roles.STAFF);
+
+            if (staff == null)
+            {
+                return new NotFoundObjectResult($"Staff with ID {staffId} not found.");
+            }
+
+            return new StaffResponse
+            {
+                Id = staff.Id.ToString(),
+                Email = staff.Email,
+                Role = staff.Role.ToString(),
+                CreatedAt = staff.Created,
+            };
+        }
+
+        public async Task<ActionResult> DeactivateStaff(string staffId)
+        {
+            if (string.IsNullOrEmpty(staffId))
+            {
+                return new BadRequestObjectResult("Staff ID is required.");
+            }
+
+            if (!Guid.TryParse(staffId, out Guid id))
+            {
+                return new BadRequestObjectResult("Invalid staff ID format.");
+            }
+
+            var staff = await _context.Users
+                .FirstOrDefaultAsync(u => u.Id == id && u.Role == Roles.STAFF);
+
+            if (staff == null)
+            {
+                return new NotFoundObjectResult($"Staff with ID {staffId} not found.");
+            }
+
+            if (!staff.IsActive)
+            {
+                return new BadRequestObjectResult($"Staff with ID {staffId} is already deactivated.");
+            }
+
+            staff.IsActive = false;
+            
+            await _context.SaveChangesAsync();
+
+            return new OkObjectResult(new { message = $"Staff with ID {staffId} deactivated successfully" });
+        }
+
+        public async Task<ActionResult> ReactivateStaff(string staffId)
+        {
+            if (string.IsNullOrEmpty(staffId))
+            {
+                return new BadRequestObjectResult("Staff ID is required.");
+            }
+
+            if (!Guid.TryParse(staffId, out Guid id))
+            {
+                return new BadRequestObjectResult("Invalid staff ID format.");
+            }
+
+            var staff = await _context.Users
+                .FirstOrDefaultAsync(u => u.Id == id && u.Role == Roles.STAFF);
+
+            if (staff == null)
+            {
+                return new NotFoundObjectResult($"Staff with ID {staffId} not found.");
+            }
+
+            if (staff.IsActive)
+            {
+                return new BadRequestObjectResult($"Staff with ID {staffId} is already active.");
+            }
+
+            staff.IsActive = true;
+            
+            await _context.SaveChangesAsync();
+
+            return new OkObjectResult(new { message = $"Staff with ID {staffId} reactivated successfully" });
+        }
     }
+    
 }
