@@ -216,7 +216,9 @@ public class AuthService : IAuthService
             Address = pendingRegistration.Address,
             Image = pendingRegistration.ImagePath,
             Role = Roles.ADMIN,
+
             IsVerified = true, 
+
             Created = DateTime.UtcNow,
             Updated = DateTime.UtcNow
         };

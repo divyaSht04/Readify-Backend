@@ -44,7 +44,9 @@ namespace Backend.Services
                 Role = Roles.STAFF,
                 Created = DateTime.UtcNow,
                 IsVerified = true,
+
                 IsActive = true,
+
             };
 
             _context.Users.Add(staff);
