@@ -2,6 +2,7 @@ namespace Backend;
 
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Backend.Model;
 
 public class Book
 {
@@ -46,5 +47,13 @@ public class Book
     [Column("image"), MaxLength(255)]
     public string? Image { get; set; }
 
+    [Column(name: "discounted_price", TypeName = "decimal(10,2)")]
+    public decimal? DiscountedPrice { get; set; }
+
+    [Column(name: "on_sale")]
+    public bool OnSale { get; set; }
+
     public virtual ICollection<BookAccolade> Accolades { get; set; }
+    
+    public virtual ICollection<BookReview> Reviews { get; set; }
 }

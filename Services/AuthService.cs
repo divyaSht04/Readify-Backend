@@ -17,13 +17,15 @@ public class AuthService : IAuthService
     private readonly JwtUtils _jwtUtils;
     private readonly IConfiguration _configuration;
     private readonly IFileService _fileService;
+    private readonly IEmailService _emailService;
 
-    public AuthService(ApplicationDBContext context, JwtUtils jwtUtils, IConfiguration configuration, IFileService fileService)
+    public AuthService(ApplicationDBContext context, JwtUtils jwtUtils, IConfiguration configuration, IFileService fileService, IEmailService emailService)
     {
         _context = context;
         _jwtUtils = jwtUtils;
         _configuration = configuration;
         _fileService = fileService;
+        _emailService = emailService;
     }
 
     public async Task<ActionResult<AuthResponse>> Login(LoginRequest request)
@@ -39,16 +41,42 @@ public class AuthService : IAuthService
         if (!BCrypt.Net.BCrypt.Verify(request.Password, user.Password))
             return new UnauthorizedObjectResult("Invalid email or password");
 
+        if (!user.IsVerified)
+            return new BadRequestObjectResult("Email not verified. Please verify your email to login.");
+
         return await GenerateAuthResponse(user);
     }
 
-    public async Task<ActionResult<AuthResponse>> Register(RegisterRequest request)
+    public async Task<ActionResult> Register(RegisterRequest request)
     {
         if (request == null)
             return new BadRequestObjectResult("Invalid client request");
 
         if (await _context.Users.AnyAsync(u => u.Email == request.Email))
             return new ConflictObjectResult("User with this email already exists");
+        
+        // Check if there's already a pending registration for this email
+        var existingPending = await _context.PendingRegistrations.FirstOrDefaultAsync(p => p.Email == request.Email);
+        if (existingPending != null)
+        {
+            // If the pending registration is expired, delete it
+            if (existingPending.OtpExpiryTime < DateTime.UtcNow)
+            {
+                _context.PendingRegistrations.Remove(existingPending);
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                // Otherwise, we can just resend the OTP
+                await _emailService.SendVerificationOtpEmailAsync(existingPending.Email, existingPending.OtpCode);
+                
+                return new OkObjectResult(new
+                {
+                    message = "Registration verification code resent. Please check your email.",
+                    email = existingPending.Email
+                });
+            }
+        }
         
         var hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password);
         Console.WriteLine($"Hashed Password: {hashedPassword}"); // Debug output
@@ -60,22 +88,36 @@ public class AuthService : IAuthService
             imagePath = await _fileService.SaveFile(request.ImageFile, "users");
         }
 
-        var user = new Users
+        // Generate OTP
+        string otp = GenerateOtp();
+        DateTime otpExpiry = DateTime.UtcNow.AddMinutes(10);
+
+        // Create pending registration
+        var pendingRegistration = new PendingRegistration
         {
             Id = Guid.NewGuid(),
             Email = request.Email,
-            Password = hashedPassword,
-            Name = request.FullName,
+            FullName = request.FullName,
             PhoneNumber = request.PhoneNumber,
             Address = request.Address,
-            Image = imagePath,
-            Role = Roles.USER
+            HashedPassword = hashedPassword,
+            ImagePath = imagePath,
+            OtpCode = otp,
+            OtpExpiryTime = otpExpiry
         };
 
-        await _context.Users.AddAsync(user);
+        await _context.PendingRegistrations.AddAsync(pendingRegistration);
         await _context.SaveChangesAsync();
 
-        return await GenerateAuthResponse(user);
+        // Send OTP email
+        await _emailService.SendVerificationOtpEmailAsync(pendingRegistration.Email, otp);
+
+        // Return email for verification page
+        return new OkObjectResult(new
+        {
+            message = "Registration initiated. Please verify your email.",
+            email = pendingRegistration.Email
+        });
     }
 
     public async Task<ActionResult<AuthResponse>> RefreshToken(RefreshTokenRequest request)
@@ -134,14 +176,13 @@ public class AuthService : IAuthService
         // Trim inputs to handle potential whitespace
         var currentPassword = request.CurrentPassword?.Trim();
         var newPassword = request.NewPassword?.Trim();
-
-        // Verify current password
+        
         if (!BCrypt.Net.BCrypt.Verify(currentPassword, user.Password))
             return new UnauthorizedObjectResult("Current password is incorrect");
 
         // Check if new password is different
         if (currentPassword == newPassword)
-            return new BadRequestObjectResult("New password must be different from the current password");
+            return new BadRequestObjectResult("New password must be different from the current password !");
 
         // Hash new password
         user.Password = BCrypt.Net.BCrypt.HashPassword(newPassword);
@@ -150,6 +191,75 @@ public class AuthService : IAuthService
         await _context.SaveChangesAsync();
 
         return new OkObjectResult(new { message = "Password changed successfully" });
+    }
+    
+    public async Task<ActionResult<AuthResponse>> VerifyOtp(VerifyOtpRequest request)
+    {
+        if (request == null || string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.OtpCode))
+            return new BadRequestObjectResult("Invalid client request");
+
+        // Check for pending registration
+        var pendingRegistration = await _context.PendingRegistrations.FirstOrDefaultAsync(p => p.Email == request.Email);
+        if (pendingRegistration == null)
+            return new NotFoundObjectResult("No pending registration found for this email");
+
+        // Validate OTP
+        if (pendingRegistration.OtpCode != request.OtpCode)
+            return new BadRequestObjectResult("Invalid OTP code");
+
+        if (pendingRegistration.OtpExpiryTime < DateTime.UtcNow)
+            return new BadRequestObjectResult("OTP has expired. Please request a new one.");
+
+        // Create the actual user
+        var user = new Users
+        {
+            Id = Guid.NewGuid(),
+            Email = pendingRegistration.Email,
+            Password = pendingRegistration.HashedPassword,
+            Name = pendingRegistration.FullName,
+            PhoneNumber = pendingRegistration.PhoneNumber,
+            Address = pendingRegistration.Address,
+            Image = pendingRegistration.ImagePath,
+            Role = Roles.USER,
+            IsVerified = true, // User is already verified
+            Created = DateTime.UtcNow,
+            Updated = DateTime.UtcNow
+        };
+
+        await _context.Users.AddAsync(user);
+        
+        // Remove the pending registration
+        _context.PendingRegistrations.Remove(pendingRegistration);
+        await _context.SaveChangesAsync();
+
+        // Generate auth response with tokens
+        return await GenerateAuthResponse(user);
+    }
+
+    public async Task<ActionResult> ResendOtp(string email)
+    {
+        if (string.IsNullOrEmpty(email))
+            return new BadRequestObjectResult("Email is required");
+
+        // Check for pending registration instead of user
+        var pendingRegistration = await _context.PendingRegistrations.FirstOrDefaultAsync(p => p.Email == email);
+        if (pendingRegistration == null)
+            return new NotFoundObjectResult("No pending registration found for this email");
+
+        // Generate new OTP
+        string otp = GenerateOtp();
+        DateTime otpExpiry = DateTime.UtcNow.AddMinutes(10);
+
+        // Update pending registration
+        pendingRegistration.OtpCode = otp;
+        pendingRegistration.OtpExpiryTime = otpExpiry;
+
+        await _context.SaveChangesAsync();
+
+        // Send OTP email
+        await _emailService.SendVerificationOtpEmailAsync(pendingRegistration.Email, otp);
+
+        return new OkObjectResult(new { message = "OTP sent successfully" });
     }
 
 
@@ -176,5 +286,12 @@ public class AuthService : IAuthService
             Role = user.Role.ToString(),
             Name = user.Name
         });
+    }
+    
+    private string GenerateOtp()
+    {
+        // Generate a 6-digit numeric OTP
+        Random random = new Random();
+        return random.Next(100000, 999999).ToString();
     }
 }

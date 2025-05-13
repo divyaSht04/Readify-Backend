@@ -15,4 +15,5 @@ public interface IBookService
     Task<ActionResult> DeleteBook(Guid id);
     Task<ActionResult<List<BookResponse>>> SearchBooks(string query);
     Task<ActionResult<List<BookResponse>>> GetComingSoonBooks();
+    Task<ActionResult<DiscountResponse>?> GetBookDiscount(Guid bookId);
 }

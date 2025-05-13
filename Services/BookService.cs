@@ -31,9 +31,8 @@ namespace Backend.Services
             var bookResponses = new List<BookResponse>();
             foreach (var book in books)
             {
-                // Check for book-specific discount
                 var bookDiscount = await GetActiveBookDiscount(now, book.ID);
-                bookResponses.Add(MapToBookResponse(book, now, bookDiscount));
+                bookResponses.Add(await MapToBookResponse(book, now, bookDiscount));
             }
             
             return bookResponses;
@@ -51,7 +50,7 @@ namespace Backend.Services
 
             // Check for book-specific discount
             var discount = await GetActiveBookDiscount(now, id);
-            return MapToBookResponse(book, now, discount);
+            return await MapToBookResponse(book, now, discount);
         }
 
         public async Task<ActionResult<BookResponse>> CreateBook(CreateBookRequest request)
@@ -89,7 +88,7 @@ namespace Backend.Services
 
             var now = DateTime.UtcNow;
             var bookDiscount = await GetActiveBookDiscount(now, book.ID);
-            return MapToBookResponse(book, now, bookDiscount);
+            return await MapToBookResponse(book, now, bookDiscount);
         }
 
         public async Task<ActionResult<BookResponse>> UpdateBook(Guid id, UpdateBookRequest request)
@@ -143,7 +142,7 @@ namespace Backend.Services
 
             var now = DateTime.UtcNow;
             var bookDiscount = await GetActiveBookDiscount(now, book.ID);
-            return MapToBookResponse(book, now, bookDiscount);
+            return await MapToBookResponse(book, now, bookDiscount);
         }
 
         public async Task<ActionResult> DeleteBook(Guid id)
@@ -190,7 +189,7 @@ namespace Backend.Services
             foreach (var book in books)
             {
                 var bookDiscount = await GetActiveBookDiscount(now, book.ID);
-                bookResponses.Add(MapToBookResponse(book, now, bookDiscount));
+                bookResponses.Add(await MapToBookResponse(book, now, bookDiscount));
             }
 
             return bookResponses;
@@ -209,7 +208,7 @@ namespace Backend.Services
             foreach (var book in books)
             {
                 var bookDiscount = await GetActiveBookDiscount(now, book.ID);
-                bookResponses.Add(MapToBookResponse(book, now, bookDiscount));
+                bookResponses.Add(await MapToBookResponse(book, now, bookDiscount));
             }
 
             return bookResponses;
@@ -217,22 +216,62 @@ namespace Backend.Services
         
         private async Task<Discount?> GetActiveBookDiscount(DateTime now, Guid bookId)
         {
+            // Get book-specific discount
             return await _context.Discounts
                 .Where(d => d.BookId == bookId && d.StartDate <= now && d.EndDate >= now)
-                .OrderByDescending(d => d.CreatedAt)
+                .OrderByDescending(d => d.CreatedAt) // Take the most recent discount if multiple overlap
                 .FirstOrDefaultAsync();
         }
         
-        private static BookResponse MapToBookResponse(Book book, DateTime now, Discount? globalDiscount)
+        public async Task<ActionResult<DiscountResponse>?> GetBookDiscount(Guid bookId)
+        {
+            var now = DateTime.UtcNow;
+            var discount = await GetActiveBookDiscount(now, bookId);
+            
+            if (discount == null)
+            {
+                return null;
+            }
+            
+            return new DiscountResponse
+            {
+                Id = discount.Id,
+                DiscountName = discount.DiscountName,
+                Percentage = discount.Percentage,
+                StartDate = discount.StartDate,
+                EndDate = discount.EndDate,
+                OnSale = discount.OnSale,
+                BookId = discount.BookId,
+                CreatedAt = discount.CreatedAt,
+                UpdatedAt = discount.UpdatedAt
+            };
+        }
+        
+        private async Task<BookResponse> MapToBookResponse(Book book, DateTime now, Discount? globalDiscount)
         {
             decimal? discountedPrice = null;
+            decimal discountPercentage = 0;
             bool onSale = false;
 
             if (globalDiscount != null)
             {
                 discountedPrice = book.Price - (book.Price * (globalDiscount.Percentage / 100));
                 onSale = globalDiscount.OnSale;
+                discountPercentage = globalDiscount.Percentage;
             }
+            
+            // Calculate book rating and review count
+            var reviews = await _context.BookReviews
+                .Where(r => r.BookId == book.ID)
+                .ToListAsync();
+            
+            double? averageRating = null;
+            if (reviews.Any())
+            {
+                averageRating = reviews.Average(r => r.Rating);
+            }
+            
+            int reviewCount = reviews.Count;
 
             return new BookResponse
             {
@@ -251,7 +290,10 @@ namespace Backend.Services
                 CreatedAt = book.CreatedAt,
                 UpdatedAt = book.UpdatedAt,
                 Category = book.Category,
-                Image = book.Image
+                Image = book.Image,
+                DiscountPercentage = discountPercentage,
+                AverageRating = averageRating,
+                ReviewCount = reviewCount
             };
         }
     }

@@ -12,9 +12,9 @@ namespace Backend.Controllers
     [Authorize(Roles = "ADMIN")]
     public class BannerAnnouncementController : ControllerBase
     {
-        private readonly BannerService _bannerService;
+        private readonly IBannerService _bannerService;
 
-        public BannerAnnouncementController(BannerService bannerService)
+        public BannerAnnouncementController(IBannerService bannerService)
         {
             _bannerService = bannerService;
         }

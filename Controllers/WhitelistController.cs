@@ -24,20 +24,20 @@ public class WhitelistController : ControllerBase
     }
 
     [HttpGet("userId/{userId}")]
-    public async Task<ActionResult<WhitelistResponseDto>> GetUserWhitelist(Guid userId)
+    public async Task<ActionResult<List<BookResponse>>> GetUserWhitelist(Guid userId)
     {
         return await _whiteListService.GetUserWhitelist(userId);
     }
 
-    [HttpPost("/bookId/{bookId}/userId/{userId}")]
-    public async Task<ActionResult<WhitelistResponseDto>> AddToWhitelist(Guid bookId, Guid userId)
+    [HttpPost("bookId/{bookId}/userId/{userId}")]
+    public async Task<ActionResult<BookResponse>> AddToWhitelist(Guid bookId, Guid userId)
     {
         return await _whiteListService.AddWhiteListAsync(bookId, userId);
     }
 
     [HttpDelete("{bookId}/user/{userId}")]
-    public async Task<ActionResult<WhitelistResponseDto>> RemoveFromWhitelist(Guid bookId, Guid userId)
+    public async Task<ActionResult<BookResponse>> RemoveFromWhitelist(Guid bookId, Guid userId)
     {
-       return await _whiteListService.AddWhiteListAsync(bookId, userId);
+       return await _whiteListService.RemoveFromWhitelist(bookId, userId);
     }
 } 
