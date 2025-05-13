@@ -41,6 +41,44 @@ public class EmailService : IEmailService
 
         await client.SendMailAsync(message);
     }
+    
+    public async Task SendVerificationOtpEmailAsync(string toEmail, string otp)
+    {
+        using var client = new SmtpClient(_smtpServer, _smtpPort)
+        {
+            Credentials = new System.Net.NetworkCredential(_smtpUsername, _smtpPassword),
+            EnableSsl = true
+        };
+
+        var message = new MailMessage
+        {
+            From = new MailAddress(_fromEmail),
+            Subject = "Account Verification - Readify",
+            Body = GenerateVerificationEmailBody(otp),
+            IsBodyHtml = true
+        };
+        message.To.Add(toEmail);
+
+        await client.SendMailAsync(message);
+    }
+
+    private string GenerateVerificationEmailBody(string otp)
+    {
+        return $@"
+            <html>
+                <body style='font-family: Arial, sans-serif;'>
+                    <h2>Welcome to Readify!</h2>
+                    <p>Thank you for registering with us. Please verify your email address to complete your registration.</p>
+                    <p><strong>Your verification code:</strong></p>
+                    <div style='background-color: #f2f2f2; padding: 10px; text-align: center; font-size: 24px; font-weight: bold; letter-spacing: 5px; margin: 20px 0;'>
+                        {otp}
+                    </div>
+                    <p>This code will expire in 10 minutes.</p>
+                    <p>If you did not request this code, please ignore this email.</p>
+                    <p>Thank you for choosing Readify!</p>
+                </body>
+            </html>";
+    }
 
     private string GenerateEmailBody(string claimCode, decimal totalAmount, List<OrderItemResponse> items)
     {

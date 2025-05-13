@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Backend.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Backend.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250512190859_jfsvniwrvb")]
+    partial class jfsvniwrvb
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -366,66 +369,6 @@ namespace Backend.Migrations
                     b.ToTable("BannerAnnouncements");
                 });
 
-            modelBuilder.Entity("Backend.PendingRegistration", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("address");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("email");
-
-                    b.Property<string>("FullName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("full_name");
-
-                    b.Property<string>("HashedPassword")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("password");
-
-                    b.Property<string>("ImagePath")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("image");
-
-                    b.Property<string>("OtpCode")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)")
-                        .HasColumnName("otp_code");
-
-                    b.Property<DateTime>("OtpExpiryTime")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("otp_expiry");
-
-                    b.Property<string>("PhoneNumber")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("phone_number");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("PendingRegistrations");
-                });
-
             modelBuilder.Entity("Backend.Users", b =>
                 {
                     b.Property<Guid>("Id")
@@ -452,24 +395,11 @@ namespace Backend.Migrations
                         .HasColumnType("character varying(100)")
                         .HasColumnName("image");
 
-                    b.Property<bool>("IsVerified")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_verified");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
                         .HasColumnName("full_name");
-
-                    b.Property<string>("OtpCode")
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)")
-                        .HasColumnName("otp_code");
-
-                    b.Property<DateTime?>("OtpExpiryTime")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("otp_expiry");
 
                     b.Property<string>("Password")
                         .IsRequired()
