@@ -80,7 +80,7 @@ public class CartService : ICartService
             {
                 BookId = request.BookId,
                 CartId = cart.Id,
-                Quantity = 1, // Always 1 when adding
+                Quantity = 1,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
@@ -213,7 +213,6 @@ public class CartService : ICartService
                 effectivePrice = discountedPrice.Value;
             }
             
-            // Calculate total price for this item (using discounted price if available)
             decimal itemTotalPrice = effectivePrice * item.Quantity;
             totalPrice += itemTotalPrice;
             totalQuantity += item.Quantity;
@@ -234,10 +233,8 @@ public class CartService : ICartService
             });
         }
         
-        // Store the original total price before any discounts
         cartResponse.OriginalTotalPrice = totalPrice;
         
-        // Apply 5% volume discount if total quantity is 5 or more
         if (totalQuantity >= 5)
         {
             cartResponse.HasVolumeDiscount = true;
@@ -246,7 +243,6 @@ public class CartService : ICartService
             cartResponse.VolumeDiscountMessage = $"5% discount applied for ordering {totalQuantity} books!";
         }
         
-        // Apply 10% loyalty discount if user has exactly 10 successful orders
         bool qualifiesForLoyaltyDiscount = await _loyaltyDiscountService.QualifiesForLoyaltyDiscount(cart.UserId);
         if (qualifiesForLoyaltyDiscount)
         {
@@ -258,7 +254,6 @@ public class CartService : ICartService
         }
         else 
         {
-            // Get current count to inform user about progress
             int currentOrderCount = await _loyaltyDiscountService.GetCompletedOrdersCount(cart.UserId);
             if (currentOrderCount > 0)
             {

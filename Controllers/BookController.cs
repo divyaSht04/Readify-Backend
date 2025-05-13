@@ -61,4 +61,10 @@ public class BookController : ControllerBase
     {
         return await _bookService.GetComingSoonBooks();
     }
+    
+    [HttpGet("best-sellers")]
+    public async Task<ActionResult<List<BookResponse>>> GetBestSellerBooks([FromQuery] int limit = 10)
+    {
+        return await _bookService.GetBestSellerBooks(limit);
+    }
 }

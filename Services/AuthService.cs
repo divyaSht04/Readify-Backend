@@ -55,11 +55,9 @@ public class AuthService : IAuthService
         if (await _context.Users.AnyAsync(u => u.Email == request.Email))
             return new ConflictObjectResult("User with this email already exists");
         
-        // Check if there's already a pending registration for this email
         var existingPending = await _context.PendingRegistrations.FirstOrDefaultAsync(p => p.Email == request.Email);
         if (existingPending != null)
         {
-            // If the pending registration is expired, delete it
             if (existingPending.OtpExpiryTime < DateTime.UtcNow)
             {
                 _context.PendingRegistrations.Remove(existingPending);
@@ -67,7 +65,6 @@ public class AuthService : IAuthService
             }
             else
             {
-                // Otherwise, we can just resend the OTP
                 await _emailService.SendVerificationOtpEmailAsync(existingPending.Email, existingPending.OtpCode);
                 
                 return new OkObjectResult(new
@@ -111,8 +108,7 @@ public class AuthService : IAuthService
 
         // Send OTP email
         await _emailService.SendVerificationOtpEmailAsync(pendingRegistration.Email, otp);
-
-        // Return email for verification page
+        
         return new OkObjectResult(new
         {
             message = "Registration initiated. Please verify your email.",
@@ -197,8 +193,7 @@ public class AuthService : IAuthService
     {
         if (request == null || string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.OtpCode))
             return new BadRequestObjectResult("Invalid client request");
-
-        // Check for pending registration
+        
         var pendingRegistration = await _context.PendingRegistrations.FirstOrDefaultAsync(p => p.Email == request.Email);
         if (pendingRegistration == null)
             return new NotFoundObjectResult("No pending registration found for this email");
@@ -221,7 +216,9 @@ public class AuthService : IAuthService
             Address = pendingRegistration.Address,
             Image = pendingRegistration.ImagePath,
             Role = Roles.ADMIN,
-            IsVerified = true, // User is already verified
+
+            IsVerified = true, 
+
             Created = DateTime.UtcNow,
             Updated = DateTime.UtcNow
         };
@@ -290,7 +287,6 @@ public class AuthService : IAuthService
     
     private string GenerateOtp()
     {
-        // Generate a 6-digit numeric OTP
         Random random = new Random();
         return random.Next(100000, 999999).ToString();
     }
