@@ -220,7 +220,7 @@ public class AuthService : IAuthService
             PhoneNumber = pendingRegistration.PhoneNumber,
             Address = pendingRegistration.Address,
             Image = pendingRegistration.ImagePath,
-            Role = Roles.USER,
+            Role = Roles.ADMIN,
             IsVerified = true, // User is already verified
             Created = DateTime.UtcNow,
             Updated = DateTime.UtcNow

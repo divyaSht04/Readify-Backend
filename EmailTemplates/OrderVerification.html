@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Order Verified - Readify</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 650px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo {
+            max-width: 150px;
+            margin-bottom: 15px;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        .success-badge {
+            background-color: #2ecc71;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        .order-info {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .claim-code {
+            font-size: 18px;
+            font-weight: bold;
+            color: #3498db;
+            letter-spacing: 1px;
+            margin: 10px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+            text-align: left;
+            padding: 10px;
+        }
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .book-title {
+            font-weight: bold;
+        }
+        .discount {
+            color: #e74c3c;
+        }
+        .discount-row {
+            background-color: #fdf2f2;
+        }
+        .discount-details {
+            background-color: #f9f9f9;
+            border-left: 4px solid #e74c3c;
+            padding: 10px 15px;
+            margin: 15px 0;
+        }
+        .savings-highlight {
+            font-weight: bold;
+            color: #e74c3c;
+        }
+        .summary {
+            margin-top: 20px;
+            border-top: 2px solid #ddd;
+            padding-top: 15px;
+        }
+        .total-row {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 14px;
+            color: #7f8c8d;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <h1>Your Order Has Been Verified!</h1>
+    <div class="success-badge">Verified & Ready</div>
+</div>
+
+<p>Dear Customer,</p>
+<p>Great news! Your order has been successfully verified by our staff and is now being processed for pickup or delivery.</p>
+
+<div class="order-info">
+    <p><strong>Order Date:</strong> {{ORDER_DATE}}</p>
+    <p><strong>Verification Date:</strong> {{VERIFICATION_DATE}}</p>
+    <p><strong>Claim Code:</strong> <span class="claim-code">{{CLAIM_CODE}}</span></p>
+    <p>Please present this claim code when picking up your books.</p>
+</div>
+
+<h2>Order Details:</h2>
+<table>
+    <thead>
+    <tr>
+        <th>Book</th>
+        <th>Author</th>
+        <th>Qty</th>
+        <th>Regular Price</th>
+        <th>Discounted Price</th>
+        <th>Total</th>
+    </tr>
+    </thead>
+    <tbody>
+    {{ORDER_ITEMS}}
+    </tbody>
+</table>
+
+{{DISCOUNT_DETAILS}}
+
+<div class="summary">
+    <table>
+        <tr>
+            <td>Subtotal:</td>
+            <td>${{ORIGINAL_TOTAL}}</td>
+        </tr>
+        {{VOLUME_DISCOUNT}}
+        {{LOYALTY_DISCOUNT}}
+        <tr class="total-row">
+            <td>Total:</td>
+            <td>${{TOTAL_AMOUNT}}</td>
+        </tr>
+    </table>
+</div>
+
+<p>Your books are now ready for pickup or delivery as per your selection. If you have any questions about your order, please contact our customer service.</p>
+
+<div class="footer">
+    <p>Thank you for choosing Readify!</p>
+    <p>&copy; {{CURRENT_YEAR}} Readify. All rights reserved.</p>
+</div>
+</body>
+</html>
