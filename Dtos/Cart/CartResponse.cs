@@ -10,6 +10,9 @@ public class CartResponse
     public decimal VolumeDiscountAmount { get; set; } = 0; // Amount saved from volume discount
     public bool HasVolumeDiscount { get; set; } // Whether volume discount was applied
     public string VolumeDiscountMessage { get; set; } // Explains the volume discount
+    public bool HasLoyaltyDiscount { get; set; } // Whether loyalty discount was applied
+    public decimal LoyaltyDiscountAmount { get; set; } = 0; // Amount saved from loyalty discount
+    public string LoyaltyDiscountMessage { get; set; } // Explains the loyalty discount
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 }

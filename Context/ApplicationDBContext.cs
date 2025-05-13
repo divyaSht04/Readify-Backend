@@ -24,6 +24,7 @@ public class ApplicationDBContext : DbContext
     
     public DbSet<Order> Orders { get; set; }
     public DbSet<OrderItem> OrderItems { get; set; }
+    public DbSet<BookReview> BookReviews { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -80,5 +81,23 @@ public class ApplicationDBContext : DbContext
         modelBuilder.Entity<Whitelist>()
             .Property(w => w.UserId)
             .HasColumnType("uuid");
+            
+        // Configure BookReview entity
+        modelBuilder.Entity<BookReview>()
+            .HasOne(br => br.Book)
+            .WithMany()
+            .HasForeignKey(br => br.BookId)
+            .OnDelete(DeleteBehavior.Cascade);
+            
+        modelBuilder.Entity<BookReview>()
+            .HasOne(br => br.User)
+            .WithMany()
+            .HasForeignKey(br => br.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+            
+        // Ensure a user can only review a book once
+        modelBuilder.Entity<BookReview>()
+            .HasIndex(br => new { br.UserId, br.BookId })
+            .IsUnique();
     }
 }
