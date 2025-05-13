@@ -247,6 +247,43 @@ namespace Backend.Services
             };
         }
         
+        public async Task<ActionResult<List<BookResponse>>> GetBestSellerBooks(int limit = 10)
+        {
+            var now = DateTime.UtcNow;
+            
+            // Get all verified orders
+            var verifiedOrders = await _context.Orders
+                .Where(o => o.Status == "Verified" || o.Status == "Completed")
+                .Include(o => o.Items)
+                .ToListAsync();
+            
+            // Group order items by book ID and sum quantities
+            var bookSales = verifiedOrders
+                .SelectMany(o => o.Items)
+                .GroupBy(i => i.BookId)
+                .Select(g => new {
+                    BookId = g.Key,
+                    TotalQuantity = g.Sum(i => i.Quantity)
+                })
+                .OrderByDescending(x => x.TotalQuantity)
+                .Take(limit)
+                .ToList();
+            
+            // Get book details for each bestseller
+            var bestSellerBooks = new List<BookResponse>();
+            foreach (var sale in bookSales)
+            {
+                var book = await _context.Books.FindAsync(sale.BookId);
+                if (book != null)
+                {
+                    var bookDiscount = await GetActiveBookDiscount(now, book.ID);
+                    bestSellerBooks.Add(await MapToBookResponse(book, now, bookDiscount));
+                }
+            }
+            
+            return bestSellerBooks;
+        }
+        
         private async Task<BookResponse> MapToBookResponse(Book book, DateTime now, Discount? globalDiscount)
         {
             decimal? discountedPrice = null;
