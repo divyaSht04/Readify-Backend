@@ -1,5 +1,6 @@
 using Backend.Dtos.BookReview;
 using Backend.Services;
+using Backend.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,7 +27,7 @@ public class BookReviewController : ControllerBase
     [Authorize]
     public async Task<ActionResult<BookReviewResponse>> GetUserReview(Guid bookId)
     {
-        var userId = User.UserId();
+        var userId = User.GetUserId();
         if (userId == Guid.Empty)
         {
             return Unauthorized("Invalid user credentials");
