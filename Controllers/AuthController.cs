@@ -29,6 +29,18 @@ public class AuthController : ControllerBase
         return await _authService.Register(request);
     }
 
+    [HttpPost("verify-otp")]
+    public async Task<ActionResult<AuthResponse>> VerifyOtp([FromBody] VerifyOtpRequest request)
+    {
+        return await _authService.VerifyOtp(request);
+    }
+
+    [HttpPost("resend-otp")]
+    public async Task<ActionResult> ResendOtp([FromBody] ResendOtpRequest request)
+    {
+        return await _authService.ResendOtp(request.Email);
+    }
+
     [HttpPost("refresh-token")]
     public async Task<ActionResult<AuthResponse>> RefreshToken([FromBody] RefreshTokenRequest request)
     {
