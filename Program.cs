@@ -69,6 +69,7 @@ builder.Services.AddScoped<IDiscountService, DiscountService>();
 builder.Services.AddScoped<IBannerService, BannerService>();
 
 builder.Services.AddScoped<AdminService>();
+builder.Services.AddScoped<DiscountService>();
 
 // Configure CORS
 builder.Services.AddCors(options =>
