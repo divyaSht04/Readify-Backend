@@ -16,4 +16,5 @@ public interface IBookService
     Task<ActionResult<List<BookResponse>>> SearchBooks(string query);
     Task<ActionResult<List<BookResponse>>> GetComingSoonBooks();
     Task<ActionResult<DiscountResponse>?> GetBookDiscount(Guid bookId);
+    Task<ActionResult<List<BookResponse>>> GetBestSellerBooks(int limit = 10);
 }

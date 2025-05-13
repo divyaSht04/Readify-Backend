@@ -43,6 +43,8 @@ namespace Backend.Services
                 Password = hashedPassword,
                 Role = Roles.STAFF,
                 Created = DateTime.UtcNow,
+                IsVerified = true,
+                IsActive = true,
             };
 
             _context.Users.Add(staff);

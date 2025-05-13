@@ -105,8 +105,7 @@ public class DiscountService: IDiscountService
 
         _context.Discounts.Add(discount);
         await _context.SaveChangesAsync();
-
-        // Update the book's discounted price and on sale status
+        
         if (book != null)
         {
             book.DiscountedPrice = book.Price * (1 - (request.Percentage / 100m));
