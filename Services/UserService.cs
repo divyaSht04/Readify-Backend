@@ -18,6 +18,29 @@ public class UserService : IUserService
         _fileService = fileService;
     }
 
+    public async Task<ActionResult> GetUserById(string userId)
+    {
+        if (string.IsNullOrEmpty(userId))
+            return new BadRequestObjectResult("User ID is required");
+
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
+        if (user == null)
+            return new NotFoundObjectResult("User not found");
+
+        return new OkObjectResult(new
+        {
+            id = user.Id,
+            email = user.Email,
+            name = user.Name,
+            phoneNumber = user.PhoneNumber,
+            address = user.Address,
+            image = user.Image,
+            role = user.Role.ToString(),
+            created = user.Created,
+            updated = user.Updated
+        });
+    }
+
     public async Task<ActionResult> EditProfile(string userId, EditProfileRequest request)
     {
         if (request == null)

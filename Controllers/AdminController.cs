@@ -22,6 +22,23 @@ namespace Backend.Controllers
         {
             return await _adminService.AddStaff(request);
         }
+        [HttpGet("staff/{staffId}")]
+        public async Task<ActionResult<StaffResponse>> GetStaff(string staffId)
+        {
+            return await _adminService.GetStaff(staffId);
+        }
+
+        [HttpPut("staff/{staffId}/deactivate")]
+        public async Task<ActionResult> DeactivateStaff(string staffId)
+        {
+            return await _adminService.DeactivateStaff(staffId);
+        }
+
+        [HttpPut("staff/{staffId}/reactivate")]
+        public async Task<ActionResult> ReactivateStaff(string staffId)
+        {
+            return await _adminService.ReactivateStaff(staffId);
+        }
 
     }
 }

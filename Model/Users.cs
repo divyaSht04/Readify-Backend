@@ -32,6 +32,15 @@ public class Users
 
     public Roles Role { get; set; } = Roles.USER;
     
+    [Column("is_verified")]
+    public bool IsVerified { get; set; } = false;
+    
+    [Column("otp_code"), MaxLength(10)]
+    public string? OtpCode { get; set; }
+    
+    [Column("otp_expiry")]
+    public DateTime? OtpExpiryTime { get; set; }
+    
     public DateTime Created { get; set; } = DateTime.UtcNow;
     
     public DateTime Updated { get; set; } = DateTime.UtcNow;
@@ -41,4 +50,5 @@ public class Users
     
     [Column("refresh_token_expiry")]
     public DateTime? RefreshTokenExpiryTime { get; set; }
+    public bool IsActive { get; set; } = true;
 }
