@@ -295,7 +295,6 @@ namespace Backend.Services
                 discountPercentage = globalDiscount.Percentage;
             }
             
-            // Calculate book rating and review count
             var reviews = await _context.BookReviews
                 .Where(r => r.BookId == book.ID)
                 .ToListAsync();
