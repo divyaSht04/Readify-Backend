@@ -73,20 +73,16 @@ public class OrderService : IOrderService
             };
             order.Items.Add(orderItem);
 
-            // Update book stock
-            var book = await _context.Books.FindAsync(cartItem.BookId);
-            if (book != null)
-            {
-                book.StockQuantity -= cartItem.Quantity;
-            }
+            // NOTE: We've removed the inventory reduction here
+            // It will now happen at verification time
         }
 
         // Save order
         await _context.Orders.AddAsync(order);
         await _context.SaveChangesAsync();
 
-        // Clear cart
-        await _cartService.ClearCart(userId);
+        // NOTE: We've removed the cart clearing here
+        // It will now happen at verification time
 
         // Send confirmation email
         await _emailService.SendOrderConfirmationEmailAsync(
@@ -124,6 +120,74 @@ public class OrderService : IOrderService
             return new NotFoundObjectResult($"Order with claim code {claimCode} not found");
         }
 
+        return await MapToOrderResponse(order);
+    }
+    
+    public async Task<ActionResult<OrderResponse>> VerifyOrderByClaimCode(string claimCode)
+    {
+        var order = await _context.Orders
+            .Include(o => o.Items)
+            .ThenInclude(i => i.Book)
+            .Include(o => o.User)
+            .FirstOrDefaultAsync(o => o.ClaimCode == claimCode);
+
+        if (order == null)
+        {
+            return new NotFoundObjectResult($"Order with claim code {claimCode} not found");
+        }
+        
+        if (order.Status == "Verified" || order.Status == "Completed")
+        {
+            return new BadRequestObjectResult($"Order with claim code {claimCode} has already been verified");
+        }
+        
+        order.Status = "Verified";
+        order.UpdatedAt = DateTime.UtcNow;
+        
+        foreach (var orderItem in order.Items)
+        {
+            var book = await _context.Books.FindAsync(orderItem.BookId);
+            if (book != null)
+            {
+                if (book.StockQuantity < orderItem.Quantity)
+                {
+                    return new BadRequestObjectResult($"Not enough stock available for book: {book.Title}");
+                }
+                
+                book.StockQuantity -= orderItem.Quantity;
+            }
+            else
+            {
+                return new NotFoundObjectResult($"Book with ID {orderItem.BookId} not found");
+            }
+        }
+        
+        await _context.SaveChangesAsync();
+        await _cartService.ClearCart(order.UserId);
+        
+        if (order.User != null && !string.IsNullOrEmpty(order.User.Email))
+        {
+            await _emailService.SendOrderVerificationEmailAsync(
+                order.User.Email,
+                order.ClaimCode,
+                order.TotalAmount,
+                order.Items.Select(i => new OrderItemResponse
+                {
+                    Id = i.Id,
+                    BookId = i.BookId,
+                    BookTitle = i.Book.Title,
+                    BookAuthor = i.Book.Author,
+                    Quantity = i.Quantity,
+                    UnitPrice = i.UnitPrice,
+                    DiscountedPrice = i.DiscountedPrice,
+                    DiscountPercentage = i.DiscountPercentage,
+                    TotalPrice = i.TotalPrice,
+                    CreatedAt = i.CreatedAt,
+                    UpdatedAt = i.UpdatedAt
+                }).ToList()
+            );
+        }
+        
         return await MapToOrderResponse(order);
     }
     
