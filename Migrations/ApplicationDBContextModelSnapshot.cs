@@ -141,6 +141,46 @@ namespace Backend.Migrations
                     b.ToTable("BookAccolades");
                 });
 
+            modelBuilder.Entity("Backend.Model.BookReview", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("BookID")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("BookId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ReviewText")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookID");
+
+                    b.HasIndex("BookId");
+
+                    b.HasIndex("UserId", "BookId")
+                        .IsUnique();
+
+                    b.ToTable("BookReviews");
+                });
+
             modelBuilder.Entity("Backend.Model.Cart", b =>
                 {
                     b.Property<Guid>("Id")
@@ -239,6 +279,9 @@ namespace Backend.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal?>("LoyaltyDiscountAmount")
+                        .HasColumnType("numeric");
 
                     b.Property<decimal>("OriginalTotalAmount")
                         .HasColumnType("numeric");
@@ -452,6 +495,9 @@ namespace Backend.Migrations
                         .HasColumnType("character varying(100)")
                         .HasColumnName("image");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("IsVerified")
                         .HasColumnType("boolean")
                         .HasColumnName("is_verified");
@@ -511,6 +557,29 @@ namespace Backend.Migrations
                         .IsRequired();
 
                     b.Navigation("Book");
+                });
+
+            modelBuilder.Entity("Backend.Model.BookReview", b =>
+                {
+                    b.HasOne("Backend.Book", null)
+                        .WithMany("Reviews")
+                        .HasForeignKey("BookID");
+
+                    b.HasOne("Backend.Book", "Book")
+                        .WithMany()
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Backend.Users", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Book");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Backend.Model.Cart", b =>
@@ -604,6 +673,8 @@ namespace Backend.Migrations
             modelBuilder.Entity("Backend.Book", b =>
                 {
                     b.Navigation("Accolades");
+
+                    b.Navigation("Reviews");
                 });
 
             modelBuilder.Entity("Backend.Model.Cart", b =>

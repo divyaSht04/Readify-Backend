@@ -78,6 +78,7 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IBookReviewService, BookReviewService>();
 
 builder.Services.AddScoped<AdminService>();
+builder.Services.AddScoped<DiscountService>();
 
 // Configure CORS
 builder.Services.AddCors(options =>
