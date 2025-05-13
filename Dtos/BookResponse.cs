@@ -23,4 +23,6 @@ public class BookResponse
     public DateTime UpdatedAt { get; set; }
     public List<string> Category { get; set; }
     public string? Image { get; set; }
+    public double? AverageRating { get; set; }
+    public int ReviewCount { get; set; }
 }

@@ -32,7 +32,7 @@ namespace Backend.Services
             foreach (var book in books)
             {
                 var bookDiscount = await GetActiveBookDiscount(now, book.ID);
-                bookResponses.Add(MapToBookResponse(book, now, bookDiscount));
+                bookResponses.Add(await MapToBookResponse(book, now, bookDiscount));
             }
             
             return bookResponses;
@@ -50,7 +50,7 @@ namespace Backend.Services
 
             // Check for book-specific discount
             var discount = await GetActiveBookDiscount(now, id);
-            return MapToBookResponse(book, now, discount);
+            return await MapToBookResponse(book, now, discount);
         }
 
         public async Task<ActionResult<BookResponse>> CreateBook(CreateBookRequest request)
@@ -88,7 +88,7 @@ namespace Backend.Services
 
             var now = DateTime.UtcNow;
             var bookDiscount = await GetActiveBookDiscount(now, book.ID);
-            return MapToBookResponse(book, now, bookDiscount);
+            return await MapToBookResponse(book, now, bookDiscount);
         }
 
         public async Task<ActionResult<BookResponse>> UpdateBook(Guid id, UpdateBookRequest request)
@@ -142,7 +142,7 @@ namespace Backend.Services
 
             var now = DateTime.UtcNow;
             var bookDiscount = await GetActiveBookDiscount(now, book.ID);
-            return MapToBookResponse(book, now, bookDiscount);
+            return await MapToBookResponse(book, now, bookDiscount);
         }
 
         public async Task<ActionResult> DeleteBook(Guid id)
@@ -189,7 +189,7 @@ namespace Backend.Services
             foreach (var book in books)
             {
                 var bookDiscount = await GetActiveBookDiscount(now, book.ID);
-                bookResponses.Add(MapToBookResponse(book, now, bookDiscount));
+                bookResponses.Add(await MapToBookResponse(book, now, bookDiscount));
             }
 
             return bookResponses;
@@ -208,7 +208,7 @@ namespace Backend.Services
             foreach (var book in books)
             {
                 var bookDiscount = await GetActiveBookDiscount(now, book.ID);
-                bookResponses.Add(MapToBookResponse(book, now, bookDiscount));
+                bookResponses.Add(await MapToBookResponse(book, now, bookDiscount));
             }
 
             return bookResponses;
@@ -247,7 +247,7 @@ namespace Backend.Services
             };
         }
         
-        private static BookResponse MapToBookResponse(Book book, DateTime now, Discount? globalDiscount)
+        private async Task<BookResponse> MapToBookResponse(Book book, DateTime now, Discount? globalDiscount)
         {
             decimal? discountedPrice = null;
             decimal discountPercentage = 0;
@@ -259,6 +259,19 @@ namespace Backend.Services
                 onSale = globalDiscount.OnSale;
                 discountPercentage = globalDiscount.Percentage;
             }
+            
+            // Calculate book rating and review count
+            var reviews = await _context.BookReviews
+                .Where(r => r.BookId == book.ID)
+                .ToListAsync();
+            
+            double? averageRating = null;
+            if (reviews.Any())
+            {
+                averageRating = reviews.Average(r => r.Rating);
+            }
+            
+            int reviewCount = reviews.Count;
 
             return new BookResponse
             {
@@ -279,6 +292,8 @@ namespace Backend.Services
                 Category = book.Category,
                 Image = book.Image,
                 DiscountPercentage = discountPercentage,
+                AverageRating = averageRating,
+                ReviewCount = reviewCount
             };
         }
     }
