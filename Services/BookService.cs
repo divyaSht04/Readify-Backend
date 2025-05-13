@@ -251,13 +251,11 @@ namespace Backend.Services
         {
             var now = DateTime.UtcNow;
             
-            // Get all verified orders
             var verifiedOrders = await _context.Orders
                 .Where(o => o.Status == "Verified" || o.Status == "Completed")
                 .Include(o => o.Items)
                 .ToListAsync();
             
-            // Group order items by book ID and sum quantities
             var bookSales = verifiedOrders
                 .SelectMany(o => o.Items)
                 .GroupBy(i => i.BookId)
@@ -297,7 +295,6 @@ namespace Backend.Services
                 discountPercentage = globalDiscount.Percentage;
             }
             
-            // Calculate book rating and review count
             var reviews = await _context.BookReviews
                 .Where(r => r.BookId == book.ID)
                 .ToListAsync();
