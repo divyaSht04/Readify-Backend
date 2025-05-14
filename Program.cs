@@ -53,6 +53,9 @@ builder.Services.AddScoped<IBookService, BookService>();
 // Register BookAccolade service
 builder.Services.AddScoped<IBookAccoladeService, BookAccoladeService>();
 
+// Register LoyaltyDiscount service (must be registered before CartService to avoid circular dependency)
+builder.Services.AddScoped<ILoyaltyDiscountService, LoyaltyDiscountService>();
+
 // Register Cart service
 builder.Services.AddScoped<ICartService, CartService>();
 

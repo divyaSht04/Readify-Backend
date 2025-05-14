@@ -22,6 +22,8 @@ public class Order
     
     public decimal? VolumeDiscountAmount { get; set; }
     
+    public decimal? LoyaltyDiscountAmount { get; set; }
+    
     [Required]
     public string Status { get; set; }
     
