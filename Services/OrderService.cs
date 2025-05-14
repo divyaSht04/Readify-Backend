@@ -192,6 +192,29 @@ public class OrderService : IOrderService
         return await MapToOrderResponse(order);
     }
     
+    public async Task<ActionResult<List<OrderResponse>>> GetUserOrders(Guid userId)
+    {
+        var orders = await _context.Orders
+            .Include(o => o.Items)
+            .ThenInclude(i => i.Book)
+            .Where(o => o.UserId == userId)
+            .OrderByDescending(o => o.CreatedAt)
+            .ToListAsync();
+
+        if (orders == null || !orders.Any())
+        {
+            return new List<OrderResponse>();
+        }
+
+        var orderResponses = new List<OrderResponse>();
+        foreach (var order in orders)
+        {
+            orderResponses.Add(await MapToOrderResponse(order));
+        }
+
+        return orderResponses;
+    }
+    
     private async Task<OrderResponse> MapToOrderResponse(Order order)
     {
         return new OrderResponse
